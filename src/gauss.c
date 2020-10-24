@@ -40,7 +40,9 @@ void gauss_init(void) {
 }
 
 void gauss_close(void) {
-    dlclose(openblas_handle);
+    if (openblas_handle) {
+        dlclose(openblas_handle);
+    }
 }
 
 void gauss_vec_add_f64(double *dst, double *a, double *b, size_t size) {
