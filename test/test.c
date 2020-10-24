@@ -12,6 +12,7 @@ int main(void) {
     size_t i;
     double ans;
 
+    gauss_init();
     for (i = 0; i < size; i++) {
         a[i] = i;
         b[i] = i * 2;
@@ -33,6 +34,7 @@ int main(void) {
     free(dst);
     free(a);
     free(b);
+    gauss_close();
 
     puts("PASS");
     return 0;
