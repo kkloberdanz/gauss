@@ -17,17 +17,17 @@ int main(void) {
         b[i] = i * 2;
     }
 
-    gauss_add_f64(dst, a, b, size);
+    gauss_vec_add_f64(dst, a, b, size);
     for (i = 0; i < size; i++) {
         assert(dst[i] == a[i] + b[i]);
     }
 
-    gauss_mul_f64(dst, a, b, size);
+    gauss_vec_mul_f64(dst, a, b, size);
     for (i = 0; i < size; i++) {
         assert(dst[i] == a[i] * b[i]);
     }
 
-    ans = gauss_dot_f64(a, b, size);
+    ans = gauss_vec_dot_f64(a, b, size);
     assert(ans == 656700.0);
 
     free(dst);
