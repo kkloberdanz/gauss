@@ -17,13 +17,25 @@ static bool has_cuda = false;
 
 void *openblas_handle = NULL;
 
-double (*_gauss_cblas_ddot)(OPENBLAS_CONST blasint n, OPENBLAS_CONST double *x, OPENBLAS_CONST blasint incx, OPENBLAS_CONST double *y, OPENBLAS_CONST blasint incy);
+double (*_gauss_cblas_ddot)(
+    OPENBLAS_CONST blasint n,
+    OPENBLAS_CONST double *x,
+    OPENBLAS_CONST blasint incx,
+    OPENBLAS_CONST double *y,
+    OPENBLAS_CONST blasint incy
+);
 
 void gauss_init(void) {
     openblas_handle = dlopen("libopenblas.so", RTLD_LAZY|RTLD_GLOBAL);
     if (openblas_handle) {
         has_openblas = true;
-        _gauss_cblas_ddot = (double (*)(OPENBLAS_CONST blasint n, OPENBLAS_CONST double *x, OPENBLAS_CONST blasint incx, OPENBLAS_CONST double *y, OPENBLAS_CONST blasint incy))dlsym(openblas_handle, "cblas_ddot");
+        _gauss_cblas_ddot = (double (*)(
+            OPENBLAS_CONST blasint n,
+            OPENBLAS_CONST double *x,
+            OPENBLAS_CONST blasint incx,
+            OPENBLAS_CONST double *y,
+            OPENBLAS_CONST blasint incy)
+        )dlsym(openblas_handle, "cblas_ddot");
     }
 }
 
