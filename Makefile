@@ -14,7 +14,7 @@ $(OBJ): $(SRC) $(INC)
 .PHONY:test
 test: test/main_test
 
-test/main_test: test/test.c
+test/main_test: test/test.c libgauss.so
 	$(CC) -o test/main_test test/test.c -l:libgauss.so -L.
 
 .PHONY: clean
