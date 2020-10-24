@@ -18,9 +18,13 @@ int main(void) {
     }
 
     gauss_add_f64(dst, a, b, size);
-
     for (i = 0; i < size; i++) {
         assert(dst[i] == a[i] + b[i]);
+    }
+
+    gauss_mul_f64(dst, a, b, size);
+    for (i = 0; i < size; i++) {
+        assert(dst[i] == a[i] * b[i]);
     }
 
     ans = gauss_dot_f64(a, b, size);
