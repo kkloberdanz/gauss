@@ -1,15 +1,24 @@
 CC=cc
 OPT=-O3
 CFLAGS=-Wall -Wextra -Wpedantic -std=gnu89 $(OPT)
-OBJECTS=$(patsubst src/%.c,obj/%.o,$(wildcard src/*.c))
+SRC=$(wildcard src/*.c)
+OBJ=$(patsubst src/%.c,obj/%.o,$(SRC))
+INC=$(wildcard include/*.h)
 
-libgauss.so: $(OBJECTS)
-	$(CC) -shared -o libgauss.so $(OBJECTS)
+libgauss.so: $(OBJ)
+	$(CC) -shared -o libgauss.so $(OBJ)
 
-$(OBJECTS): src/*.c
+$(OBJ): $(SRC) $(INC)
 	$(CC) -c -o $@ $(CFLAGS) $<
+
+.PHONY:test
+test: test/main_test
+
+test/main_test: test/test.c
+	$(CC) -o test/main_test test/test.c -l:libgauss.so -L.
 
 .PHONY: clean
 clean:
 	rm -f obj/*
 	rm -f libgauss.so
+	rm -f test/main_test
