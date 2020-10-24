@@ -1,6 +1,6 @@
 CC=cc
 OPT=-O3
-CFLAGS=-Wall -Wextra -Wpedantic -std=gnu89 $(OPT) -fPIC
+CFLAGS=-Werror -Wall -Wextra -Wpedantic -std=gnu89 $(OPT) -fPIC
 LFLAGS=
 SRC=$(wildcard src/*.c)
 OBJ=$(patsubst src/%.c,obj/%.o,$(SRC))
@@ -23,8 +23,9 @@ $(OBJ): $(SRC) $(INC)
 .PHONY:test
 test: test/main_test
 
+test/main_test: OPT:=-O0
 test/main_test: test/test.c libgauss.so
-	$(CC) -o test/main_test test/test.c -l:libgauss.so -L.
+	$(CC) -o test/main_test test/test.c $(CFLAGS) -l:libgauss.so -L.
 
 .PHONY: clean
 clean:
