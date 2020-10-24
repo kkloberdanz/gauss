@@ -1,12 +1,21 @@
 CC=cc
 OPT=-O3
-CFLAGS=-Wall -Wextra -Wpedantic -std=gnu89 $(OPT)
+CFLAGS=-Wall -Wextra -Wpedantic -std=gnu89 $(OPT) -fPIC
+LFLAGS=
 SRC=$(wildcard src/*.c)
 OBJ=$(patsubst src/%.c,obj/%.o,$(SRC))
 INC=$(wildcard include/*.h)
 
+.PHONY: release
+release: libgauss.so
+release: OPT:=-O3 -flto
+
+.PHONY: debug
+debug: libgauss.so
+debug: OPT:=-O0 -ggdb3
+
 libgauss.so: $(OBJ)
-	$(CC) -shared -o libgauss.so $(OBJ)
+	$(CC) -shared -o libgauss.so $(CFLAGS) $(OBJ) $(LFLAGS)
 
 $(OBJ): $(SRC) $(INC)
 	$(CC) -c -o $@ $(CFLAGS) $<
