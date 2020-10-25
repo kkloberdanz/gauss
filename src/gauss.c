@@ -48,34 +48,10 @@ void gauss_init(void) {
     openblas_handle = dlopen("libopenblas.so", RTLD_LAZY|RTLD_GLOBAL);
     if (openblas_handle) {
         has_openblas = true;
-        _gauss_cblas_ddot = (double (*)(
-            OPENBLAS_CONST blasint n,
-            OPENBLAS_CONST double *x,
-            OPENBLAS_CONST blasint incx,
-            OPENBLAS_CONST double *y,
-            OPENBLAS_CONST blasint incy)
-        )dlsym(openblas_handle, "cblas_ddot");
-
-        _gauss_cblas_dnrm2 = (double (*)(
-            OPENBLAS_CONST blasint n,
-            OPENBLAS_CONST double *x,
-            OPENBLAS_CONST blasint incx
-        )
-        )dlsym(openblas_handle, "cblas_dnrm2");
-
-        _gauss_cblas_dasum = (double (*)(
-            OPENBLAS_CONST blasint n,
-            OPENBLAS_CONST double *x,
-            OPENBLAS_CONST blasint incx
-        )
-        )dlsym(openblas_handle, "cblas_dasum");
-
-        _gauss_cblas_idamax = (size_t (*)(
-            OPENBLAS_CONST blasint n,
-            OPENBLAS_CONST double *x,
-            OPENBLAS_CONST blasint incx
-        )
-        )dlsym(openblas_handle, "cblas_idamax");
+        _gauss_cblas_ddot = dlsym(openblas_handle, "cblas_ddot");
+        _gauss_cblas_dnrm2 = dlsym(openblas_handle, "cblas_dnrm2");
+        _gauss_cblas_dasum = dlsym(openblas_handle, "cblas_dasum");
+        _gauss_cblas_idamax = dlsym(openblas_handle, "cblas_idamax");
     }
 }
 
