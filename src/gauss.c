@@ -32,6 +32,12 @@ double (*_gauss_cblas_dnrm2)(
     OPENBLAS_CONST blasint incx
 );
 
+double (*_gauss_cblas_dasum)(
+    OPENBLAS_CONST blasint n,
+    OPENBLAS_CONST double *x,
+    OPENBLAS_CONST blasint incx
+);
+
 void gauss_init(void) {
     openblas_handle = dlopen("libopenblas.so", RTLD_LAZY|RTLD_GLOBAL);
     if (openblas_handle) {
@@ -50,6 +56,13 @@ void gauss_init(void) {
             OPENBLAS_CONST blasint incx
         )
         )dlsym(openblas_handle, "cblas_dnrm2");
+
+        _gauss_cblas_dasum = (double (*)(
+            OPENBLAS_CONST blasint n,
+            OPENBLAS_CONST double *x,
+            OPENBLAS_CONST blasint incx
+        )
+        )dlsym(openblas_handle, "cblas_dasum");
     }
 }
 
@@ -102,4 +115,19 @@ double gauss_vec_norm_f64(double *a, size_t size) {
         norm = sqrt(norm);
     }
     return norm;
+}
+
+double gauss_vec_sumabs_f64(double *a, size_t size) {
+    size_t i;
+    double acc = 0.0;
+
+    if (has_openblas) {
+        acc = _gauss_cblas_dasum(size, a, 1);
+    } else {
+        /* if nothing better exists, brute force it */
+        for (i = 0; i < size; i++) {
+            acc += fabs(a[i]);
+        }
+    }
+    return acc;
 }

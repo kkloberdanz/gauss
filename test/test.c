@@ -42,6 +42,9 @@ int main(void) {
     ans = gauss_vec_norm_f64(a, size);
     assert(doubles_are_same(ans, 573.018324));
 
+    ans = gauss_vec_sumabs_f64(a, size);
+    assert(doubles_are_same(ans, 4950.0));
+
     free(dst);
     free(a);
     free(b);
