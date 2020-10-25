@@ -38,6 +38,12 @@ double (*_gauss_cblas_dasum)(
     OPENBLAS_CONST blasint incx
 );
 
+size_t (*_gauss_cblas_idamax)(
+    OPENBLAS_CONST blasint n,
+    OPENBLAS_CONST double *x,
+    OPENBLAS_CONST blasint incx
+);
+
 void gauss_init(void) {
     openblas_handle = dlopen("libopenblas.so", RTLD_LAZY|RTLD_GLOBAL);
     if (openblas_handle) {
@@ -63,6 +69,13 @@ void gauss_init(void) {
             OPENBLAS_CONST blasint incx
         )
         )dlsym(openblas_handle, "cblas_dasum");
+
+        _gauss_cblas_idamax = (size_t (*)(
+            OPENBLAS_CONST blasint n,
+            OPENBLAS_CONST double *x,
+            OPENBLAS_CONST blasint incx
+        )
+        )dlsym(openblas_handle, "cblas_idamax");
     }
 }
 
@@ -130,4 +143,20 @@ double gauss_vec_sumabs_f64(double *a, size_t size) {
         }
     }
     return acc;
+}
+
+size_t gauss_vec_index_max_f64(double *a, size_t size) {
+    size_t i;
+    size_t idx;
+
+    if (has_openblas) {
+        idx = _gauss_cblas_idamax(size, a, 1);
+    } else {
+        /* if nothing better exists, brute force it */
+        idx = a[0];
+        for (i = 0; i < size; i++) {
+            idx = a[i] > idx ? a[i] : idx;
+        }
+    }
+    return idx;
 }

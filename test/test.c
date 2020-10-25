@@ -19,6 +19,7 @@ int main(void) {
     double *b = malloc(sizeof(double) * size);
     size_t i;
     double ans;
+    size_t idx;
 
     gauss_init();
     for (i = 0; i < size; i++) {
@@ -44,6 +45,9 @@ int main(void) {
 
     ans = gauss_vec_sumabs_f64(a, size);
     assert(doubles_are_same(ans, 4950.0));
+
+    idx = gauss_vec_index_max_f64(a, size);
+    assert(idx == 99);
 
     free(dst);
     free(a);
