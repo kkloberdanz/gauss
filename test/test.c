@@ -1,8 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <string.h>
+#include <stdbool.h>
+#include <math.h>
 
 #include "../include/gauss.h"
+
+bool doubles_are_same(double a, double b) {
+    const double epsilon = 0.0001;
+    return fabs(a - b) <= epsilon * fabs(a);
+}
 
 int main(void) {
     const size_t size = 100;
@@ -29,7 +37,10 @@ int main(void) {
     }
 
     ans = gauss_vec_dot_f64(a, b, size);
-    assert(ans == 656700.0);
+    assert(doubles_are_same(ans, 656700.0));
+
+    ans = gauss_vec_norm_f64(a, size);
+    assert(doubles_are_same(ans, 573.018324));
 
     free(dst);
     free(a);

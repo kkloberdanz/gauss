@@ -1,7 +1,7 @@
 CC=cc
 OPT=-O3
 CFLAGS=-Werror -Wall -Wextra -std=gnu89 $(OPT) -fPIC
-LFLAGS=-ldl
+LFLAGS=-ldl -lm
 SRC=$(wildcard src/*.c)
 OBJ=$(patsubst src/%.c,obj/%.o,$(SRC))
 INC=$(wildcard include/*.h)
@@ -23,8 +23,7 @@ $(OBJ): $(SRC) $(INC)
 .PHONY:test
 test: test/main_test
 
-test/main_test: OPT:=-O0
-test/main_test: test/test.c libgauss.so
+test/main_test: debug test/test.c
 	$(CC) -o test/main_test test/test.c $(CFLAGS) -l:libgauss.so -L.
 
 .PHONY: clean
@@ -32,3 +31,4 @@ clean:
 	rm -f obj/*
 	rm -f libgauss.so
 	rm -f test/main_test
+	rm -f core
