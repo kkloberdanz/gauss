@@ -15,7 +15,6 @@ void gauss_sqrt_float_array(
 
 #ifdef __AVX512F__
     /* AVX-512 */
-#pragma omp parallel for
     for(; i < (size & ~0xf); i += 16) {
         const __m512 kA8 = _mm512_load_ps(&a[i]);
         const __m512 kRes = _mm512_sqrt_ps(kA8);
@@ -180,6 +179,10 @@ void *gauss_simd_alloc(size_t size) {
 
 double gauss_double_array_at(const double *arr, size_t i) {
     return arr[i];
+}
+
+void gauss_set_double_array_at(double *arr, size_t i, double value) {
+    arr[i] = value;
 }
 
 void gauss_free(void *ptr) {

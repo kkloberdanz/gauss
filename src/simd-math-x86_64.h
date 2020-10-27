@@ -40,4 +40,6 @@ void *gauss_simd_alloc(size_t size);
 
 double gauss_double_array_at(const double *arr, size_t i);
 
+void gauss_set_double_array_at(double *arr, size_t i, double value);
+
 #endif /* SIMD_MATH_X86_64 */
