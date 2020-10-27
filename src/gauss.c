@@ -2,9 +2,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <math.h>
-
 #include <dlfcn.h>
-
 #include <cblas.h>
 
 #include "../include/gauss.h"

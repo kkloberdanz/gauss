@@ -1,5 +1,4 @@
 CC=cc
-OPT=-O3
 CFLAGS=-Werror -Wall -Wextra -std=gnu89 $(OPT) -fPIC
 LFLAGS=-ldl -lm
 SRC=$(wildcard src/*.c)
@@ -8,7 +7,7 @@ INC=$(wildcard include/*.h)
 
 .PHONY: release
 release: libgauss.so
-release: OPT:=-O3 -flto
+release: OPT:=-Ofast -march=haswell -mtune=haswell -flto
 
 .PHONY: debug
 debug: libgauss.so
@@ -17,8 +16,8 @@ debug: OPT:=-O0 -ggdb3
 libgauss.so: $(OBJ)
 	$(CC) -shared -o libgauss.so $(CFLAGS) $(OBJ) $(LFLAGS)
 
-$(OBJ): $(SRC) $(INC)
-	$(CC) -c -o $@ $(CFLAGS) $< $(LFLAGS)
+obj/%.o: src/%.c
+	$(CC) -c -o $@ $(CFLAGS) $<
 
 .PHONY:test
 test: test/main_test
