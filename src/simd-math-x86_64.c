@@ -158,7 +158,7 @@ void gauss_floordiv_double_array(
     }
 #endif
 
-#ifdef __SSE2__
+#ifdef __SSE4_1__
     /* SSE2 loop */
     for (; i < (size & ~0x1); i += 2) {
         const __m128d kA2 = _mm_load_pd(&a[i]);

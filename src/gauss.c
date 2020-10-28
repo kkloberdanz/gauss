@@ -104,6 +104,16 @@ double gauss_vec_norm_f64(double *a, size_t size) {
     return norm;
 }
 
+double gauss_vec_sum_f64(double *a, size_t size) {
+    size_t i;
+    double acc = 0.0;
+
+    for (i = 0; i < size; i++) {
+        acc += a[i];
+    }
+    return acc;
+}
+
 double gauss_vec_sumabs_f64(double *a, size_t size) {
     size_t i;
     double acc = 0.0;
