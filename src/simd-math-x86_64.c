@@ -270,7 +270,11 @@ void gauss_add_double_array(
 void *aligned_alloc(size_t, size_t);
 
 void *gauss_simd_alloc(size_t size) {
+#ifndef UNKNOWN_SIMD
     return aligned_alloc(SIMD_ALIGN_SIZE, size);
+#else
+    return malloc(size);
+#endif
 }
 
 double gauss_double_array_at(const double *arr, size_t i) {

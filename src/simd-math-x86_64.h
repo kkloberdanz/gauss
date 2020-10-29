@@ -14,6 +14,8 @@
 #        ifdef __SSE2__
 #            define SIMD_ALIGN __attribute__ ((aligned (32)))
 #            define SIMD_ALIGN_SIZE 32
+#        else
+#           define UNKNOWN_SIMD
 #        endif
 #    endif
 #endif
