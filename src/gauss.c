@@ -88,7 +88,7 @@ double gauss_vec_dot_f64(double *a, double *b, size_t size) {
     return acc;
 }
 
-double gauss_vec_norm_f64(double *a, size_t size) {
+double gauss_vec_l2norm_f64(double *a, size_t size) {
     size_t i;
     double norm = 0.0;
 
@@ -114,7 +114,7 @@ double gauss_vec_sum_f64(double *a, size_t size) {
     return acc;
 }
 
-double gauss_vec_sumabs_f64(double *a, size_t size) {
+double gauss_vec_l1norm_f64(double *a, size_t size) {
     size_t i;
     double acc = 0.0;
 
