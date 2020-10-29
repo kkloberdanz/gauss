@@ -4,8 +4,10 @@
 #include <math.h>
 #include <dlfcn.h>
 #include <cblas.h>
+#include <string.h>
 
 #include "../include/gauss.h"
+#include "simd-math-x86_64.h"
 
 static bool has_openblas = false;
 /* TODO: use these to provide best implementation for the data given
@@ -42,6 +44,13 @@ size_t (*_gauss_cblas_idamax)(
     OPENBLAS_CONST blasint incx
 );
 
+size_t (*_gauss_cblas_dscal)(
+    OPENBLAS_CONST blasint n,
+    OPENBLAS_CONST double a,
+    OPENBLAS_CONST double *x,
+    OPENBLAS_CONST blasint incx
+);
+
 void gauss_init(void) {
     openblas_handle = dlopen("libopenblas.so", RTLD_LAZY|RTLD_GLOBAL);
     if (openblas_handle) {
@@ -50,6 +59,7 @@ void gauss_init(void) {
         _gauss_cblas_dnrm2 = dlsym(openblas_handle, "cblas_dnrm2");
         _gauss_cblas_dasum = dlsym(openblas_handle, "cblas_dasum");
         _gauss_cblas_idamax = dlsym(openblas_handle, "cblas_idamax");
+        _gauss_cblas_dscal = dlsym(openblas_handle, "cblas_dscal");
     }
 }
 
@@ -57,6 +67,11 @@ void gauss_close(void) {
     if (openblas_handle) {
         dlclose(openblas_handle);
     }
+}
+
+void gauss_vec_scale_f64(double *dst, double *a, size_t size, double scalar) {
+    memcpy(dst, a, size * sizeof(double));
+    _gauss_cblas_dscal(size, scalar, dst, 1);
 }
 
 void gauss_vec_add_f64(double *dst, double *a, double *b, size_t size) {
