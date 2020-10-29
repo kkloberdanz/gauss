@@ -1,8 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <emmintrin.h>
-#include <immintrin.h>
 #include <math.h>
+
+#ifdef __AVX__
+    #include <emmintrin.h>
+#endif
+
+#ifdef __SSE__
+    #include <immintrin.h>
+#endif
 
 #include "simd-math-x86_64.h"
 
