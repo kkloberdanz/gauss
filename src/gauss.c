@@ -71,7 +71,14 @@ void gauss_close(void) {
 
 void gauss_vec_scale_f64(double *dst, double *a, size_t size, double scalar) {
     memcpy(dst, a, size * sizeof(double));
-    _gauss_cblas_dscal(size, scalar, dst, 1);
+    if (has_openblas) {
+        _gauss_cblas_dscal(size, scalar, dst, 1);
+    } else {
+        size_t i;
+        for (i = 0; i < size; i++) {
+            dst[i] = a[i] * scalar;
+        }
+    }
 }
 
 void gauss_vec_add_f64(double *dst, double *a, double *b, size_t size) {
