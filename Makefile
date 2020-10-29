@@ -9,6 +9,10 @@ INC=$(wildcard include/*.h)
 release: libgauss.so
 release: OPT:=-Ofast -march=haswell -mtune=haswell -flto
 
+.PHONY: native
+native: libgauss.so
+native: OPT:=-Ofast -march=native -mtune=native -flto
+
 .PHONY: debug
 debug: libgauss.so
 debug: OPT:=-O0 -ggdb3
