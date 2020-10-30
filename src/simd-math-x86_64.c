@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
 
 #ifdef __AVX__
     #include <emmintrin.h>
@@ -368,6 +369,33 @@ double gauss_mean_double_array(
         acc += a[i];
     }
     return acc / size;
+}
+
+int compare_double(const void *a, const void *b) {
+    return (*(double *)a - *(double *)b) > 0.0;
+}
+
+static char is_even(size_t n) {
+    return (n & 1) == 0;
+}
+
+double gauss_median_double_array(
+    const double *a,
+    const size_t size
+) {
+    double med;
+    double *buf = gauss_simd_alloc(sizeof(double) * size);
+
+    memcpy(buf, a, sizeof(double) * size);
+    qsort(buf, size, sizeof(double), compare_double);
+    if (is_even(size)) {
+        med = buf[size / 2];
+    } else {
+        size_t idx = size / 2;
+        med = (buf[idx] + buf[idx + 1]) / 2;
+    }
+    free(buf);
+    return med;
 }
 
 void *aligned_alloc(size_t, size_t);
