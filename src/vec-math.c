@@ -386,21 +386,20 @@ static char is_even(size_t n) {
 }
 
 double gauss_median_double_array(
+    double *scratch,
     const double *a,
     const size_t size
 ) {
     double med;
-    double *buf = gauss_simd_alloc(sizeof(double) * size);
 
-    memcpy(buf, a, sizeof(double) * size);
-    qsort(buf, size, sizeof(double), compare_double);
+    memcpy(scratch, a, sizeof(double) * size);
+    qsort(scratch, size, sizeof(double), compare_double);
     if (is_even(size)) {
-        med = buf[size / 2];
+        med = scratch[size / 2];
     } else {
         size_t idx = size / 2;
-        med = (buf[idx] + buf[idx + 1]) / 2;
+        med = (scratch[idx] + scratch[idx + 1]) / 2;
     }
-    free(buf);
     return med;
 }
 
