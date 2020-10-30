@@ -11,7 +11,7 @@
     #include <immintrin.h>
 #endif
 
-#include "../include/simd-math-x86_64.h"
+#include "../include/vec-math.h"
 
 void gauss_sqrt_float_array(
     float *result,
@@ -426,4 +426,19 @@ double gauss_vec_sum_f64(double *a, size_t size) {
         acc += a[i];
     }
     return acc;
+}
+
+double gauss_variance_f64(double *a, size_t size) {
+    double acc = 0.0;
+    size_t i;
+    double mean = gauss_mean_double_array(a, size);
+
+    for (i = 0; i < size; i++) {
+        acc += (a[i] - mean) * (a[i] - mean);
+    }
+    return acc / size;
+}
+
+double gauss_standard_deviation_f64(double *a, size_t size) {
+    return sqrt(gauss_variance_f64(a, size));
 }

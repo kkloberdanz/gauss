@@ -1,6 +1,6 @@
 #include <stdlib.h>
 
-#include "../include/simd-math-x86_64.h"
+#include "../include/vec-math.h"
 #include "../include/util.h"
 
 void *aligned_alloc(size_t, size_t);
