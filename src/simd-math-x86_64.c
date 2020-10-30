@@ -11,7 +11,7 @@
     #include <immintrin.h>
 #endif
 
-#include "simd-math-x86_64.h"
+#include "../include/simd-math-x86_64.h"
 
 void gauss_sqrt_float_array(
     float *result,
@@ -371,8 +371,14 @@ double gauss_mean_double_array(
     return acc / size;
 }
 
-int compare_double(const void *a, const void *b) {
-    return (*(double *)a - *(double *)b) > 0.0;
+static int compare_double(const void *a, const void *b) {
+    if (*(double *)a < *(double *)b) {
+        return -1;
+    } else if (*(double *)a > *(double *)b) {
+        return 1;
+    } else {
+        return 0;
+    }
 }
 
 static char is_even(size_t n) {
@@ -398,24 +404,26 @@ double gauss_median_double_array(
     return med;
 }
 
-void *aligned_alloc(size_t, size_t);
-
-void *gauss_simd_alloc(size_t size) {
-#ifndef UNKNOWN_SIMD
-    return aligned_alloc(SIMD_ALIGN_SIZE, size);
-#else
-    return malloc(size);
-#endif
+void gauss_vec_add_f64(double *dst, double *a, double *b, size_t size) {
+    size_t i;
+    for (i = 0; i < size; i++) {
+        dst[i] = a[i] + b[i];
+    }
 }
 
-double gauss_double_array_at(const double *arr, size_t i) {
-    return arr[i];
+void gauss_vec_mul_f64(double *dst, double *a, double *b, size_t size) {
+    size_t i;
+    for (i = 0; i < size; i++) {
+        dst[i] = a[i] * b[i];
+    }
 }
 
-void gauss_set_double_array_at(double *arr, size_t i, double value) {
-    arr[i] = value;
-}
+double gauss_vec_sum_f64(double *a, size_t size) {
+    size_t i;
+    double acc = 0.0;
 
-void gauss_free(void *ptr) {
-    free(ptr);
+    for (i = 0; i < size; i++) {
+        acc += a[i];
+    }
+    return acc;
 }

@@ -1,18 +1,40 @@
-#ifndef GAUSS_H
-#define GAUSS_H
+#include <cblas.h>
+#include <stdbool.h>
+#include <dlfcn.h>
 
-#include <stddef.h>
+extern double (*_gauss_cblas_ddot)(
+    OPENBLAS_CONST blasint n,
+    OPENBLAS_CONST double *x,
+    OPENBLAS_CONST blasint incx,
+    OPENBLAS_CONST double *y,
+    OPENBLAS_CONST blasint incy
+);
+
+extern double (*_gauss_cblas_dnrm2)(
+    OPENBLAS_CONST blasint n,
+    OPENBLAS_CONST double *x,
+    OPENBLAS_CONST blasint incx
+);
+
+extern double (*_gauss_cblas_dasum)(
+    OPENBLAS_CONST blasint n,
+    OPENBLAS_CONST double *x,
+    OPENBLAS_CONST blasint incx
+);
+
+extern size_t (*_gauss_cblas_idamax)(
+    OPENBLAS_CONST blasint n,
+    OPENBLAS_CONST double *x,
+    OPENBLAS_CONST blasint incx
+);
+
+extern size_t (*_gauss_cblas_dscal)(
+    OPENBLAS_CONST blasint n,
+    OPENBLAS_CONST double a,
+    OPENBLAS_CONST double *x,
+    OPENBLAS_CONST blasint incx
+);
 
 void gauss_init(void);
+
 void gauss_close(void);
-
-double gauss_vec_dot_f64(double *a, double *b, size_t size);
-double gauss_vec_norm_f64(double *a, size_t size);
-double gauss_vec_sumabs_f64(double *a, size_t size);
-
-size_t gauss_vec_index_max_f64(double *a, size_t size);
-
-void gauss_vec_add_f64(double *dst, double *a, double *b, size_t size);
-void gauss_vec_mul_f64(double *dst, double *a, double *b, size_t size);
-
-#endif /* GAUSS_H */
