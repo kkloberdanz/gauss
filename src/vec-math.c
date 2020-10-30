@@ -441,3 +441,14 @@ double gauss_variance_f64(double *a, size_t size) {
 double gauss_standard_deviation_f64(double *a, size_t size) {
     return sqrt(gauss_variance_f64(a, size));
 }
+
+double gauss_min_vec_f64(const double *a, size_t size) {
+    size_t i;
+    double min_element = a[0];
+    for (i = 0; i < size; i++) {
+        if (a[i] < min_element) {
+            min_element = a[i];
+        }
+    }
+    return min_element;
+}
