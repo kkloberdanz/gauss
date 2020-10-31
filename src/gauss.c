@@ -1,6 +1,8 @@
 #include "../include/gauss.h"
+#include "../include/opencl.h"
 
 static bool has_openblas = false;
+static bool has_clblas = false;
 /* TODO: use these to provide best implementation for the data given
 static bool has_mkl = false;
 static bool has_opencl = false;
@@ -8,6 +10,7 @@ static bool has_cuda = false;
 */
 
 void *openblas_handle = NULL;
+void *clblas_handle = NULL;
 
 double (*_gauss_cblas_ddot)(
     OPENBLAS_CONST blasint n,
@@ -52,10 +55,20 @@ void gauss_init(void) {
         _gauss_cblas_idamax = dlsym(openblas_handle, "cblas_idamax");
         _gauss_cblas_dscal = dlsym(openblas_handle, "cblas_dscal");
     }
+
+    clblas_handle = dlopen("libclBLAS.so", RTLD_LAZY|RTLD_GLOBAL);
+    if (clblas_handle) {
+        has_clblas = true;
+        gauss_init_opencl();
+    }
 }
 
 void gauss_close(void) {
     if (openblas_handle) {
         dlclose(openblas_handle);
+    }
+    if (has_clblas) {
+        gauss_close_opencl();
+        dlclose(clblas_handle);
     }
 }

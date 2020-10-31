@@ -1,6 +1,6 @@
 CC=cc
 CFLAGS=-Werror -Wall -Wextra -std=gnu89 $(OPT) -fPIC
-LFLAGS=-ldl -lm
+LFLAGS=-ldl -lm -lOpenCL -lclBLAS
 SRC=$(wildcard src/*.c)
 OBJ=$(patsubst src/%.c,obj/%.o,$(SRC))
 INC=$(wildcard include/*.h)

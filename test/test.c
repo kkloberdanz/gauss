@@ -5,7 +5,15 @@
 #include <stdbool.h>
 #include <math.h>
 
+#include "../include/blas-level1.h"
 #include "../include/gauss.h"
+#include "../include/util.h"
+#include "../include/vec-math.h"
+
+bool floats_are_same(float a, float b) {
+    const float epsilon = 0.001;
+    return fabs(a - b) <= epsilon * fabs(a);
+}
 
 bool doubles_are_same(double a, double b) {
     const double epsilon = 0.0001;
@@ -17,14 +25,21 @@ int main(void) {
     double *dst = malloc(sizeof(double) * size);
     double *a = malloc(sizeof(double) * size);
     double *b = malloc(sizeof(double) * size);
+    float *c = malloc(sizeof(float) * size);
+    float *d = malloc(sizeof(float) * size);
     size_t i;
     double ans;
+    float ans_f32 = 0.0;
     size_t idx;
+    gauss_Error err = gauss_OK;
 
     gauss_init();
+
     for (i = 0; i < size; i++) {
         a[i] = i;
         b[i] = i * 2;
+        c[i] = i;
+        d[i] = i * 2;
     }
 
     gauss_vec_add_f64(dst, a, b, size);
@@ -40,10 +55,14 @@ int main(void) {
     ans = gauss_vec_dot_f64(a, b, size);
     assert(doubles_are_same(ans, 656700.0));
 
-    ans = gauss_vec_norm_f64(a, size);
+    err = gauss_vec_dot_f32(c, d, size, &ans_f32);
+    assert(err == gauss_OK);
+    assert(floats_are_same(ans_f32, 656700.0));
+
+    ans = gauss_vec_l2norm_f64(a, size);
     assert(doubles_are_same(ans, 573.018324));
 
-    ans = gauss_vec_sumabs_f64(a, size);
+    ans = gauss_vec_l1norm_f64(a, size);
     assert(doubles_are_same(ans, 4950.0));
 
     idx = gauss_vec_index_max_f64(a, size);
@@ -52,6 +71,8 @@ int main(void) {
     free(dst);
     free(a);
     free(b);
+    free(c);
+    free(d);
     gauss_close();
 
     puts("PASS");

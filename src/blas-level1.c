@@ -6,7 +6,9 @@
 #include <string.h>
 
 #include "../include/gauss.h"
+#include "../include/util.h"
 #include "../include/blas-level1.h"
+#include "../include/opencl.h"
 
 static bool has_openblas = false;
 /* TODO: use these to provide best implementation for the data given
@@ -25,6 +27,18 @@ void gauss_vec_scale_f64(double *dst, double *a, size_t size, double scalar) {
             dst[i] = a[i] * scalar;
         }
     }
+}
+
+gauss_Error gauss_vec_dot_f32(float *a, float *b, size_t size, float *out) {
+    gauss_Error status_code = gauss_clblas_sdot(
+        size,
+        a,
+        1,
+        b,
+        1,
+        out
+    );
+    return status_code;
 }
 
 double gauss_vec_dot_f64(double *a, double *b, size_t size) {
