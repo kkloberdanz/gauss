@@ -55,6 +55,13 @@ void gauss_sub_double_scalar(
     size_t size
 );
 
+void gauss_sub_double_array(
+    double *result,
+    const double *a,
+    const double *b,
+    size_t size
+);
+
 void gauss_sqrt_double_array(double *result, const double *a, size_t size);
 
 void gauss_sqrt_float_array(float *result, const float *a, size_t size);
