@@ -1,30 +1,9 @@
-/* ************************************************************************
- * Copyright 2013 Advanced Micro Devices, Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * ************************************************************************/
 #define CL_USE_DEPRECATED_OPENCL_1_2_APIS
 #include <sys/types.h>
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-/* Include CLBLAS header. It automatically includes needed OpenCL header,
- * so we can drop out explicit inclusion of cl.h header.
- */
 #include <clBLAS.h>
-/* This example uses predefined matrices and their characteristics for
- * simplicity purpose.
- */
 
 #include "../include/util.h"
 
@@ -71,7 +50,50 @@ gauss_Error gauss_init_opencl(void) {
     return gauss_OK;
 }
 
-/* Prepare OpenCL memory objects and place matrices inside them. */
+/*
+static void print_arr_f32(float *arr, size_t size) {
+    size_t i = 0;
+    for (i = 0; i < size - 1; i++) {
+        printf("%f, ", arr[i]);
+    }
+    if (i > 0) {
+        printf("%f", arr[i]);
+    }
+    printf("\n");
+}
+*/
+
+void gauss_opencl_free(cl_mem ptr) {
+    clReleaseMemObject(ptr);
+}
+
+gauss_Error gauss_enqueue_gpu_memory(float *ptr, size_t nmemb) {
+    int err = gauss_OK;
+    cl_mem buf = clCreateBuffer(
+        ctx,
+        CL_MEM_READ_ONLY,
+        (nmemb * sizeof(cl_float)),
+        NULL,
+        &err
+    );
+    err = clEnqueueWriteBuffer(
+        queue,
+        buf,
+        CL_TRUE,
+        0,
+        (nmemb * sizeof(cl_float)),
+        ptr,
+        0,
+        NULL,
+        NULL
+    );
+    if (err) {
+        return gauss_GENERIC_ERROR;
+    } else {
+        return gauss_OK;
+    }
+}
+
 gauss_Error gauss_clblas_sdot(
     const size_t N,
     cl_float X[],
@@ -100,16 +122,13 @@ gauss_Error gauss_clblas_sdot(
     err = clblasSdot( N, bufDotP, 0, bufX, 0, incx, bufY, 0, incy, scratchBuff,
                                     1, &queue, 0, NULL, &event);
     if (err != CL_SUCCESS) {
-        printf("clblasSdot() failed with %d\n", err);
         status_code = gauss_GENERIC_ERROR;
-    }
-    else {
+    } else {
         /* Wait for calculations to be finished. */
         err = clWaitForEvents(1, &event);
         /* Fetch results of calculations from GPU memory. */
         err = clEnqueueReadBuffer(queue, bufDotP, CL_TRUE, 0, sizeof(cl_float),
                                     &dotProduct, 0, NULL, NULL);
-        printf("Result dot product: %f\n", dotProduct);
     }
     *out = dotProduct;
     /* Release OpenCL events. */
