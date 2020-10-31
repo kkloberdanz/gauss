@@ -6,7 +6,7 @@
 #include <string.h>
 
 #include "../include/gauss.h"
-#include "../include/vec-math.h"
+#include "../include/blas-level1.h"
 
 static bool has_openblas = false;
 /* TODO: use these to provide best implementation for the data given
