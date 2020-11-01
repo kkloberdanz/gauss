@@ -1,6 +1,7 @@
 #define CL_USE_DEPRECATED_OPENCL_1_2_APIS
 #include <sys/types.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <math.h>
 
@@ -14,30 +15,30 @@ gauss_Error gauss_init_opencl(void) {
     cl_int err;
     cl_platform_id platform = 0;
     cl_device_id device = 0;
-    cl_context_properties props[3] = { CL_CONTEXT_PLATFORM, 0, 0 };
+    cl_context_properties props[3] = {CL_CONTEXT_PLATFORM, 0, 0};
 
     /* Setup OpenCL environment. */
     err = clGetPlatformIDs(1, &platform, NULL);
     if (err != CL_SUCCESS) {
-        printf( "clGetPlatformIDs() failed with %d\n", err );
-        return gauss_GENERIC_ERROR;
+        printf("clGetPlatformIDs() failed with %d\n", err);
+        return gauss_CL_ERROR;
     }
     err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 1, &device, NULL);
     if (err != CL_SUCCESS) {
-        printf( "clGetDeviceIDs() failed with %d\n", err );
-        return gauss_GENERIC_ERROR;
+        printf("clGetDeviceIDs() failed with %d\n", err);
+        return gauss_CL_ERROR;
     }
     props[1] = (cl_context_properties)platform;
     ctx = clCreateContext(props, 1, &device, NULL, NULL, &err);
     if (err != CL_SUCCESS) {
-        printf( "clCreateContext() failed with %d\n", err );
-        return gauss_GENERIC_ERROR;
+        printf("clCreateContext() failed with %d\n", err);
+        return gauss_CL_ERROR;
     }
     queue = clCreateCommandQueue(ctx, device, 0, &err);
     if (err != CL_SUCCESS) {
-        printf( "clCreateCommandQueue() failed with %d\n", err );
+        printf("clCreateCommandQueue() failed with %d\n", err);
         clReleaseContext(ctx);
-        return gauss_GENERIC_ERROR;
+        return gauss_CL_ERROR;
     }
     /* Setup clblas. */
     err = clblasSetup();
@@ -45,7 +46,7 @@ gauss_Error gauss_init_opencl(void) {
         printf("clblasSetup() failed with %d\n", err);
         clReleaseCommandQueue(queue);
         clReleaseContext(ctx);
-        return gauss_GENERIC_ERROR;
+        return gauss_CL_ERROR;
     }
     return gauss_OK;
 }
@@ -88,7 +89,7 @@ gauss_Error gauss_enqueue_gpu_memory(float *ptr, size_t nmemb) {
         NULL
     );
     if (err) {
-        return gauss_GENERIC_ERROR;
+        return gauss_CL_ERROR;
     } else {
         return gauss_OK;
     }
@@ -122,7 +123,7 @@ gauss_Error gauss_clblas_sdot(
     err = clblasSdot( N, bufDotP, 0, bufX, 0, incx, bufY, 0, incy, scratchBuff,
                                     1, &queue, 0, NULL, &event);
     if (err != CL_SUCCESS) {
-        status_code = gauss_GENERIC_ERROR;
+        status_code = gauss_CL_ERROR;
     } else {
         /* Wait for calculations to be finished. */
         err = clWaitForEvents(1, &event);

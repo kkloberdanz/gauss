@@ -3,6 +3,7 @@
 
 #include <cblas.h>
 #include <stdbool.h>
+
 #include "opencl.h"
 
 typedef enum gauss_MemKind {

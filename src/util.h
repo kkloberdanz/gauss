@@ -8,7 +8,8 @@ void *gauss_simd_alloc(size_t size);
 typedef enum gauss_Error {
     gauss_OUT_OF_MEMORY = -1,
     gauss_OK = 0,
-    gauss_GENERIC_ERROR = 1
+    gauss_GENERIC_ERROR = 1,
+    gauss_CL_ERROR = 2
 } gauss_Error;
 
 #endif /* GAUSS_UTIL_H */
