@@ -47,21 +47,65 @@ size_t (*_gauss_cblas_dscal)(
     OPENBLAS_CONST blasint incx
 );
 
+float (*_gauss_cblas_sdot)(
+    OPENBLAS_CONST blasint n,
+    OPENBLAS_CONST float *x,
+    OPENBLAS_CONST blasint incx,
+    OPENBLAS_CONST float *y,
+    OPENBLAS_CONST blasint incy
+);
+
+float (*_gauss_cblas_snrm2)(
+    OPENBLAS_CONST blasint n,
+    OPENBLAS_CONST float *x,
+    OPENBLAS_CONST blasint incx
+);
+
+float (*_gauss_cblas_sasum)(
+    OPENBLAS_CONST blasint n,
+    OPENBLAS_CONST float *x,
+    OPENBLAS_CONST blasint incx
+);
+
+size_t (*_gauss_cblas_isamax)(
+    OPENBLAS_CONST blasint n,
+    OPENBLAS_CONST float *x,
+    OPENBLAS_CONST blasint incx
+);
+
+size_t (*_gauss_cblas_sscal)(
+    OPENBLAS_CONST blasint n,
+    OPENBLAS_CONST float a,
+    OPENBLAS_CONST float *x,
+    OPENBLAS_CONST blasint incx
+);
+
 void gauss_init(void) {
     openblas_handle = dlopen("libopenblas.so", RTLD_LAZY|RTLD_GLOBAL);
     if (openblas_handle) {
         has_openblas = true;
+
+        /* double implementations */
         _gauss_cblas_ddot = dlsym(openblas_handle, "cblas_ddot");
         _gauss_cblas_dnrm2 = dlsym(openblas_handle, "cblas_dnrm2");
         _gauss_cblas_dasum = dlsym(openblas_handle, "cblas_dasum");
         _gauss_cblas_idamax = dlsym(openblas_handle, "cblas_idamax");
         _gauss_cblas_dscal = dlsym(openblas_handle, "cblas_dscal");
+
+        /* float implementations */
+        _gauss_cblas_sdot = dlsym(openblas_handle, "cblas_sdot");
+        _gauss_cblas_snrm2 = dlsym(openblas_handle, "cblas_snrm2");
+        _gauss_cblas_sasum = dlsym(openblas_handle, "cblas_sasum");
+        _gauss_cblas_isamax = dlsym(openblas_handle, "cblas_isamax");
+        _gauss_cblas_sscal = dlsym(openblas_handle, "cblas_sscal");
     }
 
     clblas_handle = dlopen("libclBLAS.so", RTLD_LAZY|RTLD_GLOBAL);
     if (clblas_handle) {
         if (gauss_init_opencl() == gauss_OK) {
             has_clblas = true;
+        } else {
+            dlclose(clblas_handle);
         }
     }
 }
@@ -85,6 +129,12 @@ gauss_Mem *gauss_alloc(size_t nmemb, gauss_MemKind kind) {
     ptr->kind = kind;
     ptr->data.vd = NULL;
     switch (kind) {
+        case gauss_RECCOMENDED:
+            /* TODO:
+             * let gauss reccomend a backend that is best suited to
+             * your system */
+            break;
+
         case gauss_FLOAT:
             ptr->data.flt = gauss_simd_alloc(sizeof(float) * nmemb);
             break;
@@ -94,7 +144,8 @@ gauss_Mem *gauss_alloc(size_t nmemb, gauss_MemKind kind) {
             break;
 
         case gauss_CL_FLOAT:
-            /* TODO: create function to allocate and enqueu an OpenCL buffer */
+            /* TODO:
+             * create function to allocate and enqueue an OpenCL buffer */
             break;
     }
 

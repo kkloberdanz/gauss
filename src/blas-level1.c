@@ -11,8 +11,8 @@
 #include "opencl.h"
 
 void gauss_vec_scale_f64(double *dst, double *a, size_t size, double scalar) {
-    memcpy(dst, a, size * sizeof(double));
     if (has_openblas) {
+        memcpy(dst, a, size * sizeof(double));
         _gauss_cblas_dscal(size, scalar, dst, 1);
     } else {
         size_t i;
@@ -22,7 +22,19 @@ void gauss_vec_scale_f64(double *dst, double *a, size_t size, double scalar) {
     }
 }
 
-gauss_Error gauss_vec_dot_f32(float *a, float *b, size_t size, float *out) {
+void gauss_vec_scale_f32(float *dst, float *a, size_t size, float scalar) {
+    if (has_openblas) {
+        memcpy(dst, a, size * sizeof(float));
+        _gauss_cblas_sscal(size, scalar, dst, 1);
+    } else {
+        size_t i;
+        for (i = 0; i < size; i++) {
+            dst[i] = a[i] * scalar;
+        }
+    }
+}
+
+gauss_Error gauss_vec_dot_cl_float(float *a, float *b, size_t size, float *out) {
     gauss_Error status_code = gauss_clblas_sdot(
         size,
         a,
@@ -32,6 +44,21 @@ gauss_Error gauss_vec_dot_f32(float *a, float *b, size_t size, float *out) {
         out
     );
     return status_code;
+}
+
+float gauss_vec_dot_f32(float *a, float *b, size_t size) {
+    float acc = 0.0;
+    size_t i;
+
+    if (has_openblas) {
+        acc = _gauss_cblas_sdot(size, a, 1, b, 1);
+    } else {
+        /* if nothing better exists, brute force it */
+        for (i = 0; i < size; i++) {
+            acc += a[i] * b[i];
+        }
+    }
+    return acc;
 }
 
 double gauss_vec_dot_f64(double *a, double *b, size_t size) {
