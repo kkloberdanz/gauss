@@ -75,3 +75,37 @@ void gauss_close(void) {
         dlclose(clblas_handle);
     }
 }
+
+gauss_Mem *gauss_alloc(size_t nmemb, gauss_MemKind kind) {
+    gauss_Mem *ptr = malloc(sizeof(gauss_Mem));
+    if (!ptr) {
+        goto fail;
+    }
+
+    ptr->kind = kind;
+    ptr->data.vd = NULL;
+    switch (kind) {
+        case gauss_FLOAT:
+            ptr->data.flt = gauss_simd_alloc(sizeof(float) * nmemb);
+            break;
+
+        case gauss_DOUBLE:
+            ptr->data.dbl = gauss_simd_alloc(sizeof(double) * nmemb);
+            break;
+
+        case gauss_CL_FLOAT:
+            /* TODO: create function to allocate and enqueu an OpenCL buffer */
+            break;
+    }
+
+    if (!ptr->data.vd) {
+        goto free_ptr;
+    }
+
+    return ptr;
+
+free_ptr:
+    free(ptr);
+fail:
+    return NULL;
+}

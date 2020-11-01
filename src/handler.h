@@ -15,6 +15,7 @@ typedef enum gauss_MemKind {
 typedef struct gauss_Mem {
     gauss_MemKind kind;
     union {
+        void *vd;
         double *dbl;
         float *flt;
         cl_mem cl_float;
