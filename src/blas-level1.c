@@ -92,6 +92,22 @@ double gauss_vec_l2norm_f64(double *a, size_t size) {
     return norm;
 }
 
+float gauss_vec_l2norm_f32(float *a, size_t size) {
+    size_t i;
+    float norm = 0.0;
+
+    if (has_openblas) {
+        norm = _gauss_cblas_snrm2(size, a, 1);
+    } else {
+        /* if nothing better exists, brute force it */
+        for (i = 0; i < size; i++) {
+            norm += a[i] * a[i];
+        }
+        norm = sqrt(norm);
+    }
+    return norm;
+}
+
 double gauss_vec_l1norm_f64(double *a, size_t size) {
     size_t i;
     double acc = 0.0;
@@ -107,12 +123,43 @@ double gauss_vec_l1norm_f64(double *a, size_t size) {
     return acc;
 }
 
+float gauss_vec_l1norm_f32(float *a, size_t size) {
+    size_t i;
+    float acc = 0.0;
+
+    if (has_openblas) {
+        acc = _gauss_cblas_sasum(size, a, 1);
+    } else {
+        /* if nothing better exists, brute force it */
+        for (i = 0; i < size; i++) {
+            acc += fabs(a[i]);
+        }
+    }
+    return acc;
+}
+
 size_t gauss_vec_index_max_f64(double *a, size_t size) {
     size_t i;
     size_t idx;
 
     if (has_openblas) {
         idx = _gauss_cblas_idamax(size, a, 1);
+    } else {
+        /* if nothing better exists, brute force it */
+        idx = a[0];
+        for (i = 0; i < size; i++) {
+            idx = a[i] > idx ? a[i] : idx;
+        }
+    }
+    return idx;
+}
+
+size_t gauss_vec_index_max_f32(float *a, size_t size) {
+    size_t i;
+    size_t idx;
+
+    if (has_openblas) {
+        idx = _gauss_cblas_isamax(size, a, 1);
     } else {
         /* if nothing better exists, brute force it */
         idx = a[0];

@@ -39,18 +39,21 @@ gauss_Error ordinary_least_squares(
     double mean_x = gauss_mean_double_array(x, size);
     double mean_y = gauss_mean_double_array(y, size);
     double *squared_data = NULL;
+    double *y_diff_from_mean;
+    double *m_mul_term;
+    double *x_diff_from_mean;
 
-    double *x_diff_from_mean = gauss_simd_alloc(sizeof(double) * size);
+    x_diff_from_mean = gauss_simd_alloc(sizeof(double) * size);
     if (!x_diff_from_mean) {
         goto exit_oom;
     }
 
-    double *y_diff_from_mean = gauss_simd_alloc(sizeof(double) * size);
+    y_diff_from_mean = gauss_simd_alloc(sizeof(double) * size);
     if (!y_diff_from_mean) {
         goto free_x_diff;
     }
 
-    double *m_mul_term = gauss_simd_alloc(sizeof(double) * size);
+    m_mul_term = gauss_simd_alloc(sizeof(double) * size);
     if (!y_diff_from_mean) {
         goto free_y_diff;
     }
