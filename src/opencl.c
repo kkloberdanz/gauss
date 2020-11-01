@@ -3,9 +3,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-#include <clBLAS.h>
 
-#include "../include/util.h"
+#include "util.h"
+#include "opencl.h"
 
 static cl_command_queue queue = 0;
 static cl_context ctx = 0;
@@ -112,9 +112,9 @@ gauss_Error gauss_clblas_sdot(
 
     bufX = clCreateBuffer(ctx, CL_MEM_READ_ONLY, (lenX*sizeof(cl_float)), NULL, &err);
     bufY = clCreateBuffer(ctx, CL_MEM_READ_ONLY, (lenY*sizeof(cl_float)), NULL, &err);
-    // Allocate 1 element space for dotProduct
+    /* Allocate 1 element space for dotProduct */
     bufDotP = clCreateBuffer(ctx, CL_MEM_WRITE_ONLY, (sizeof(cl_float)), NULL, &err);
-    // Allocate minimum of N elements
+    /* Allocate minimum of N elements */
     scratchBuff = clCreateBuffer(ctx, CL_MEM_READ_WRITE, (N*sizeof(cl_float)), NULL, &err);
     err = clEnqueueWriteBuffer(queue, bufX, CL_TRUE, 0, (lenX*sizeof(cl_float)), X, 0, NULL, NULL);
     err = clEnqueueWriteBuffer(queue, bufY, CL_TRUE, 0, (lenY*sizeof(cl_float)), Y, 0, NULL, NULL);

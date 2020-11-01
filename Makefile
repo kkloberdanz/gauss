@@ -3,7 +3,8 @@ CFLAGS=-Werror -Wall -Wextra -std=gnu89 $(OPT) -fPIC
 LFLAGS=-ldl -lm -lOpenCL -lclBLAS
 SRC=$(wildcard src/*.c)
 OBJ=$(patsubst src/%.c,obj/%.o,$(SRC))
-INC=$(wildcard include/*.h)
+INC=$(wildcard src/*.h)
+EXTERN_INC=$(wildcard include/*.h)
 
 .PHONY: release
 release: libgauss.so
@@ -20,7 +21,7 @@ debug: OPT:=-O0 -ggdb3
 libgauss.so: $(OBJ)
 	$(CC) -shared -o libgauss.so $(CFLAGS) $(OBJ) $(LFLAGS)
 
-obj/%.o: src/%.c
+obj/%.o: src/%.c $(INC) $(EXTERN_INC)
 	$(CC) -c -o $@ $(CFLAGS) $<
 
 .PHONY:test

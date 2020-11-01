@@ -11,7 +11,7 @@
     #include <immintrin.h>
 #endif
 
-#include "../include/vec-math.h"
+#include "vec-math.h"
 
 void gauss_sqrt_float_array(
     float *result,

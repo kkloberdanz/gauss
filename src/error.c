@@ -1,8 +1,8 @@
 #include <stdlib.h>
 
-#include "../include/vec-math.h"
-#include "../include/util.h"
-#include "../include/blas-level1.h"
+#include "vec-math.h"
+#include "util.h"
+#include "blas-level1.h"
 
 gauss_Error guass_mean_squared_error(
     double *y_true,

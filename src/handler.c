@@ -1,5 +1,7 @@
-#include "../include/gauss.h"
-#include "../include/opencl.h"
+#include <dlfcn.h>
+
+#include "handler.h"
+#include "opencl.h"
 
 bool has_openblas = false;
 bool has_clblas = false;
@@ -58,8 +60,9 @@ void gauss_init(void) {
 
     clblas_handle = dlopen("libclBLAS.so", RTLD_LAZY|RTLD_GLOBAL);
     if (clblas_handle) {
-        has_clblas = true;
-        gauss_init_opencl();
+        if (gauss_init_opencl() == gauss_OK) {
+            has_clblas = true;
+        }
     }
 }
 

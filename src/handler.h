@@ -1,6 +1,24 @@
+#ifndef GAUSS_HANDLER_H
+#define GAUSS_HANDLER_H
+
 #include <cblas.h>
 #include <stdbool.h>
-#include <dlfcn.h>
+#include "opencl.h"
+
+typedef enum gauss_MemKind {
+    gauss_FLOAT,
+    gauss_DOUBLE,
+    gauss_CL_FLOAT
+} gauss_MemKind;
+
+typedef struct gauss_Mem {
+    gauss_MemKind kind;
+    union {
+        double *dbl;
+        float *flt;
+        cl_mem cl_float;
+    } data;
+} gauss_Mem;
 
 extern double (*_gauss_cblas_ddot)(
     OPENBLAS_CONST blasint n,
@@ -43,3 +61,5 @@ extern bool has_openblas;
 extern bool has_clblas;
 extern void *openblas_handle;
 extern void *clblas_handle;
+
+#endif /* GAUSS_HANDLER_H */

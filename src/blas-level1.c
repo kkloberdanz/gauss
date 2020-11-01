@@ -5,10 +5,10 @@
 #include <dlfcn.h>
 #include <string.h>
 
-#include "../include/gauss.h"
-#include "../include/util.h"
-#include "../include/blas-level1.h"
-#include "../include/opencl.h"
+#include "handler.h"
+#include "util.h"
+#include "blas-level1.h"
+#include "opencl.h"
 
 void gauss_vec_scale_f64(double *dst, double *a, size_t size, double scalar) {
     memcpy(dst, a, size * sizeof(double));

@@ -1,7 +1,7 @@
 #include <stdlib.h>
 
-#include "../include/vec-math.h"
-#include "../include/util.h"
+#include "vec-math.h"
+#include "util.h"
 
 /*
 def ordinary_least_squares(x, y):

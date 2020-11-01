@@ -1,5 +1,5 @@
-#ifndef BLAS_LEVEL1_H
-#define BLAS_LEVEL1_H
+#ifndef GAUSS_BLAS_LEVEL1_H
+#define GAUSS_BLAS_LEVEL1_H
 
 #include <stddef.h>
 
@@ -17,4 +17,4 @@ size_t gauss_vec_index_max_f64(double *a, size_t size);
 
 gauss_Error gauss_vec_dot_f32(float *a, float *b, size_t size, float *out);
 
-#endif /* BLAS_LEVEL1_H */
+#endif /* GAUSS_BLAS_LEVEL1_H */

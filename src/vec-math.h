@@ -1,5 +1,5 @@
-#ifndef SIMD_MATH_X86_64
-#define SIMD_MATH_X86_64
+#ifndef GAUSS_VEC_MATH_H
+#define GAUSS_VEC_MATH_H
 
 #include <stdio.h>
 
@@ -80,4 +80,4 @@ void gauss_vec_add_f64(double *dst, double *a, double *b, size_t size);
 
 void gauss_vec_mul_f64(double *dst, double *a, double *b, size_t size);
 
-#endif /* SIMD_MATH_X86_64 */
+#endif /* GAUSS_VEC_MATH_H */

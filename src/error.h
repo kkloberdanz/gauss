@@ -1,5 +1,5 @@
-#ifndef ERROR_H
-#define ERROR_H
+#ifndef GAUSS_ERROR_H
+#define GAUSS_ERROR_H
 
 #include "util.h"
 
@@ -10,4 +10,4 @@ gauss_Error guass_mean_squared_error(
     double *out_mse
 );
 
-#endif /* ERROR_H */
+#endif /* GAUSS_ERROR_H */

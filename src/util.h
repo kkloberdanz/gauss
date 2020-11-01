@@ -1,5 +1,5 @@
-#ifndef UTIL_H
-#define UTIL_H
+#ifndef GAUSS_UTIL_H
+#define GAUSS_UTIL_H
 
 #include <stddef.h>
 
@@ -11,4 +11,4 @@ typedef enum gauss_Error {
     gauss_GENERIC_ERROR = 1
 } gauss_Error;
 
-#endif /* UTIL_H */
+#endif /* GAUSS_UTIL_H */
