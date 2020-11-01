@@ -1,8 +1,8 @@
 #include "../include/gauss.h"
 #include "../include/opencl.h"
 
-static bool has_openblas = false;
-static bool has_clblas = false;
+bool has_openblas = false;
+bool has_clblas = false;
 /* TODO: use these to provide best implementation for the data given
 static bool has_mkl = false;
 static bool has_opencl = false;

@@ -10,13 +10,6 @@
 #include "../include/blas-level1.h"
 #include "../include/opencl.h"
 
-static bool has_openblas = false;
-/* TODO: use these to provide best implementation for the data given
-static bool has_mkl = false;
-static bool has_opencl = false;
-static bool has_cuda = false;
-*/
-
 void gauss_vec_scale_f64(double *dst, double *a, size_t size, double scalar) {
     memcpy(dst, a, size * sizeof(double));
     if (has_openblas) {

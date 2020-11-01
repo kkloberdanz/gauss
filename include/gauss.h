@@ -38,3 +38,8 @@ extern size_t (*_gauss_cblas_dscal)(
 void gauss_init(void);
 
 void gauss_close(void);
+
+extern bool has_openblas;
+extern bool has_clblas;
+extern void *openblas_handle;
+extern void *clblas_handle;
