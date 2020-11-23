@@ -127,7 +127,6 @@ gauss_Error gauss_set_buffer(gauss_Mem *dst, void *src) {
     gauss_Error error = gauss_OK;
     switch (kind) {
         case gauss_CL_FLOAT: {
-            fprintf(stderr, "setting cl buffer\n");
             float *as_float = (float *)src;
             cl_int err = clEnqueueWriteBuffer(
                 gauss_get_queue(),
@@ -141,7 +140,6 @@ gauss_Error gauss_set_buffer(gauss_Mem *dst, void *src) {
                 NULL
             );
             if (err) {
-                fprintf(stderr, "error setting cl buffer\n");
                 error = gauss_CL_ERROR;
             }
             break;
@@ -160,7 +158,6 @@ gauss_Error gauss_set_buffer(gauss_Mem *dst, void *src) {
 
 gauss_Mem *gauss_alloc(size_t nmemb, gauss_MemKind kind) {
     gauss_Mem *ptr = malloc(sizeof(gauss_Mem));
-    fprintf(stderr, "allocating memkind: %d\n", kind);
     if (!ptr) {
         goto fail;
     }
@@ -170,17 +167,14 @@ gauss_Mem *gauss_alloc(size_t nmemb, gauss_MemKind kind) {
     ptr->nmemb = nmemb;
     switch (kind) {
         case gauss_FLOAT:
-            fprintf(stderr, "allocating float\n");
             ptr->data.flt = gauss_simd_alloc(sizeof(float) * nmemb);
             break;
 
         case gauss_DOUBLE:
-            fprintf(stderr, "allocating double\n");
             ptr->data.dbl = gauss_simd_alloc(sizeof(double) * nmemb);
             break;
 
         case gauss_CL_FLOAT: {
-            fprintf(stderr, "allocating cl float\n");
             cl_context ctx = gauss_get_cl_ctx();
             cl_int err = 0;
             cl_mem cl_buf = clCreateBuffer(

@@ -121,7 +121,6 @@ gauss_Error gauss_clblas_sdot(
     bufX = X->data.cl_float;
     bufY = Y->data.cl_float;
 
-    fprintf(stderr, "using opencl\n");
 
 /*
     bufX = clCreateBuffer(

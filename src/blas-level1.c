@@ -54,30 +54,24 @@ gauss_Error gauss_vec_dot(gauss_Mem *a, gauss_Mem *b, void *out) {
     gauss_Error error = gauss_OK;
 
     if (a->kind != b->kind) {
-        fprintf(stderr, "mismatched types\n");
         return gauss_MISMATCHED_TYPES;
     }
 
     if (a->nmemb != b->nmemb) {
-        fprintf(stderr, "mismatched dimensions\n");
         return gauss_MISMATCHED_DIMENSIONS;
     }
 
-    fprintf(stderr, "kind: %d\n", a->kind);
     switch (a->kind) {
         case gauss_FLOAT:
-            fprintf(stderr, "calling sdot\n");
             *(float *)out = gauss_vec_dot_f32(a->data.flt, b->data.flt, a->nmemb);
             break;
 
         case gauss_DOUBLE:
-            fprintf(stderr, "calling ddot\n");
             *(double *)out = gauss_vec_dot_f64(a->data.dbl, b->data.dbl, a->nmemb);
             break;
 
         case gauss_CL_FLOAT: {
             float cl_out = 0.0;
-            fprintf(stderr, "calling CL sdot\n");
             error = gauss_clblas_sdot(
                 a->nmemb,
                 a,
