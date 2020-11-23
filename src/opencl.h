@@ -1,10 +1,6 @@
 #ifndef GAUSS_OPENCL_H
 #define GAUSS_OPENCL_H
 
-#define CL_TARGET_OPENCL_VERSION 120
-
-#include <clBLAS.h>
-
 #include "util.h"
 #include "alloc.h"
 

@@ -1,6 +1,7 @@
 #ifndef ALLOC_H
 #define ALLOC_H
 
+#define CL_TARGET_OPENCL_VERSION 120
 #include <clBLAS.h>
 
 typedef enum gauss_MemKind {
