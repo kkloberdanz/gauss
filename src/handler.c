@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <dlfcn.h>
+#include <string.h>
 
 #include "handler.h"
 #include "opencl.h"
@@ -121,33 +122,82 @@ void gauss_close(void) {
     }
 }
 
+gauss_Error gauss_set_buffer(gauss_Mem *dst, void *src) {
+    gauss_MemKind kind = dst->kind;
+    gauss_Error error = gauss_OK;
+    switch (kind) {
+        case gauss_CL_FLOAT: {
+            fprintf(stderr, "setting cl buffer\n");
+            float *as_float = (float *)src;
+            cl_int err = clEnqueueWriteBuffer(
+                gauss_get_queue(),
+                dst->data.cl_float,
+                CL_TRUE,
+                0,
+                (dst->nmemb * sizeof(cl_float)),
+                as_float,
+                0,
+                NULL,
+                NULL
+            );
+            if (err) {
+                fprintf(stderr, "error setting cl buffer\n");
+                error = gauss_CL_ERROR;
+            }
+            break;
+        }
+
+        case gauss_FLOAT:
+            memcpy(dst->data.flt, src, sizeof(float) * dst->nmemb);
+            break;
+
+        case gauss_DOUBLE:
+            memcpy(dst->data.dbl, src, sizeof(double) * dst->nmemb);
+            break;
+    }
+    return error;
+}
+
 gauss_Mem *gauss_alloc(size_t nmemb, gauss_MemKind kind) {
     gauss_Mem *ptr = malloc(sizeof(gauss_Mem));
+    fprintf(stderr, "allocating memkind: %d\n", kind);
     if (!ptr) {
         goto fail;
     }
 
     ptr->kind = kind;
     ptr->data.vd = NULL;
+    ptr->nmemb = nmemb;
     switch (kind) {
-        case gauss_RECCOMENDED:
-            /* TODO:
-             * let gauss reccomend a backend that is best suited to
-             * your system */
-            break;
-
         case gauss_FLOAT:
+            fprintf(stderr, "allocating float\n");
             ptr->data.flt = gauss_simd_alloc(sizeof(float) * nmemb);
             break;
 
         case gauss_DOUBLE:
+            fprintf(stderr, "allocating double\n");
             ptr->data.dbl = gauss_simd_alloc(sizeof(double) * nmemb);
             break;
 
-        case gauss_CL_FLOAT:
+        case gauss_CL_FLOAT: {
             /* TODO:
              * create function to allocate and enqueue an OpenCL buffer */
+            fprintf(stderr, "allocating cl float\n");
+            cl_context ctx = gauss_get_cl_ctx();
+            cl_int err = 0;
+            cl_mem cl_buf = clCreateBuffer(
+                ctx,
+                CL_MEM_READ_ONLY,
+                (nmemb * sizeof(cl_float)),
+                NULL,
+                &err
+            );
+            if (err) {
+                goto free_ptr;
+            }
+            ptr->data.cl_float = cl_buf;
             break;
+        }
     }
 
     if (!ptr->data.vd) {
@@ -160,4 +210,24 @@ free_ptr:
     free(ptr);
 fail:
     return NULL;
+}
+
+void gauss_free(gauss_Mem *ptr) {
+    if (ptr) {
+        switch (ptr->kind) {
+            case gauss_CL_FLOAT:
+                clReleaseMemObject(ptr->data.cl_float);
+                break;
+
+            case gauss_FLOAT:
+                free(ptr->data.flt);
+                break;
+
+            case gauss_DOUBLE:
+                free(ptr->data.dbl);
+                break;
+        }
+        ptr->data.vd = NULL;
+        free(ptr);
+    }
 }

@@ -6,16 +6,23 @@
 #include <clBLAS.h>
 
 #include "util.h"
+#include "alloc.h"
+
+cl_context gauss_get_cl_ctx(void);
+
+cl_command_queue gauss_get_queue(void);
 
 gauss_Error gauss_close_opencl(void);
+
 gauss_Error gauss_init_opencl(void);
+
 gauss_Error gauss_clblas_sdot(
     const size_t N,
-    cl_float X[],
+    gauss_Mem *X,
     const int incx,
-    cl_float Y[],
+    gauss_Mem *Y,
     const int incy,
-    float *out
+    float *out /* result from dot product */
 );
 
 #endif /* GAUSS_OPENCL_H */

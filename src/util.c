@@ -24,7 +24,3 @@ void gauss_set_double_array_at(double *arr, size_t i, double value) {
 void gauss_set_float_array_at(float *arr, size_t i, float value) {
     arr[i] = value;
 }
-
-void gauss_free(void *ptr) {
-    free(ptr);
-}

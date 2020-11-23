@@ -34,7 +34,10 @@ void gauss_vec_scale_f32(float *dst, float *a, size_t size, float scalar) {
     }
 }
 
-gauss_Error gauss_vec_dot_cl_float(float *a, float *b, size_t size, float *out) {
+/*
+gauss_Error gauss_vec_dot_cl_float(
+    float *a, float *b, size_t size, float *out
+) {
     gauss_Error status_code = gauss_clblas_sdot(
         size,
         a,
@@ -44,6 +47,53 @@ gauss_Error gauss_vec_dot_cl_float(float *a, float *b, size_t size, float *out) 
         out
     );
     return status_code;
+}
+*/
+
+gauss_Error gauss_vec_dot(gauss_Mem *a, gauss_Mem *b, void *out) {
+    gauss_Error error = gauss_OK;
+
+    if (a->kind != b->kind) {
+        fprintf(stderr, "mismatched types\n");
+        return gauss_MISMATCHED_TYPES;
+    }
+
+    if (a->nmemb != b->nmemb) {
+        fprintf(stderr, "mismatched dimensions\n");
+        return gauss_MISMATCHED_DIMENSIONS;
+    }
+
+    fprintf(stderr, "kind: %d\n", a->kind);
+    switch (a->kind) {
+        case gauss_FLOAT:
+            fprintf(stderr, "calling sdot\n");
+            *(float *)out = gauss_vec_dot_f32(a->data.flt, b->data.flt, a->nmemb);
+            break;
+
+        case gauss_DOUBLE:
+            fprintf(stderr, "calling ddot\n");
+            *(double *)out = gauss_vec_dot_f64(a->data.dbl, b->data.dbl, a->nmemb);
+            break;
+
+        case gauss_CL_FLOAT: {
+            float cl_out = 0.0;
+            fprintf(stderr, "calling CL sdot\n");
+            error = gauss_clblas_sdot(
+                a->nmemb,
+                a,
+                1,
+                b,
+                1,
+                &cl_out /* result from dot product */
+            );
+            if (!error) {
+                *(float *)out = cl_out;
+            }
+            break;
+        }
+    }
+
+    return error;
 }
 
 float gauss_vec_dot_f32(float *a, float *b, size_t size) {
@@ -168,4 +218,45 @@ size_t gauss_vec_index_max_f32(float *a, size_t size) {
         }
     }
     return idx;
+}
+
+gauss_Error gauss_vec_scale(
+    gauss_Mem *dst,
+    gauss_Mem *a,
+    size_t size,
+    void *scalar
+) {
+    if (dst->kind != a->kind) {
+        fprintf(
+            stderr,
+            "mismatched types on gauss_vec_scale, %d != %d",
+            dst->kind,
+            a->kind
+        );
+    }
+
+    switch (dst->kind) {
+        case gauss_DOUBLE:
+            gauss_vec_scale_f64(
+                dst->data.dbl,
+                a->data.dbl,
+                size,
+                *(double *)scalar
+            );
+            break;
+
+        case gauss_FLOAT:
+            gauss_vec_scale_f32(
+                dst->data.flt,
+                a->data.flt,
+                size,
+                *(double *)scalar
+            );
+            break;
+
+        case gauss_CL_FLOAT:
+            break;
+    }
+
+    return gauss_OK;
 }

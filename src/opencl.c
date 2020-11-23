@@ -7,9 +7,18 @@
 
 #include "util.h"
 #include "opencl.h"
+#include "handler.h"
 
 static cl_command_queue queue = 0;
 static cl_context ctx = 0;
+
+cl_context gauss_get_cl_ctx(void) {
+    return ctx;
+}
+
+cl_command_queue gauss_get_queue(void) {
+    return queue;
+}
 
 gauss_Error gauss_init_opencl(void) {
     cl_int err;
@@ -97,31 +106,89 @@ gauss_Error gauss_enqueue_gpu_memory(float *ptr, size_t nmemb) {
 
 gauss_Error gauss_clblas_sdot(
     const size_t N,
-    cl_float X[],
+    gauss_Mem *X,
     const int incx,
-    cl_float Y[],
+    gauss_Mem *Y,
     const int incy,
     float *out /* result from dot product */
 ) {
     cl_float dotProduct; /* result from dot product */
     cl_int err;
     gauss_Error status_code = gauss_OK;
-    int lenX = 1 + (N-1)*abs(incx);
-    int lenY = 1 + (N-1)*abs(incy);
     cl_mem bufX, bufY, bufDotP, scratchBuff;
     cl_event event = NULL;
 
-    bufX = clCreateBuffer(ctx, CL_MEM_READ_ONLY, (lenX*sizeof(cl_float)), NULL, &err);
-    bufY = clCreateBuffer(ctx, CL_MEM_READ_ONLY, (lenY*sizeof(cl_float)), NULL, &err);
+    bufX = X->data.cl_float;
+    bufY = Y->data.cl_float;
+
+    fprintf(stderr, "using opencl\n");
+
+/*
+    bufX = clCreateBuffer(
+        ctx,
+        CL_MEM_READ_ONLY,
+        (lenX*sizeof(cl_float)),
+        NULL,
+        &err
+    );
+
+    bufY = clCreateBuffer(
+        ctx,
+        CL_MEM_READ_ONLY,
+        (lenY*sizeof(cl_float)),
+        NULL,
+        &err
+    );
+*/
+
     /* Allocate 1 element space for dotProduct */
-    bufDotP = clCreateBuffer(ctx, CL_MEM_WRITE_ONLY, (sizeof(cl_float)), NULL, &err);
+    bufDotP = clCreateBuffer(
+        ctx,
+        CL_MEM_WRITE_ONLY,
+        (sizeof(cl_float)),
+        NULL,
+        &err
+    );
+
     /* Allocate minimum of N elements */
-    scratchBuff = clCreateBuffer(ctx, CL_MEM_READ_WRITE, (N*sizeof(cl_float)), NULL, &err);
-    err = clEnqueueWriteBuffer(queue, bufX, CL_TRUE, 0, (lenX*sizeof(cl_float)), X, 0, NULL, NULL);
-    err = clEnqueueWriteBuffer(queue, bufY, CL_TRUE, 0, (lenY*sizeof(cl_float)), Y, 0, NULL, NULL);
+    scratchBuff = clCreateBuffer(
+        ctx,
+        CL_MEM_READ_WRITE,
+        (N*sizeof(cl_float)),
+        NULL,
+        &err
+    );
+
+/*
+    err = clEnqueueWriteBuffer(
+        queue,
+        bufX,
+        CL_TRUE,
+        0,
+        (lenX*sizeof(cl_float)),
+        X,
+        0,
+        NULL,
+        NULL
+    );
+
+    err = clEnqueueWriteBuffer(
+        queue,
+        bufY,
+        CL_TRUE,
+        0,
+        (lenY*sizeof(cl_float)),
+        Y,
+        0,
+        NULL,
+        NULL
+    );
+*/
+
     /* Call clblas function. */
-    err = clblasSdot( N, bufDotP, 0, bufX, 0, incx, bufY, 0, incy, scratchBuff,
-                                    1, &queue, 0, NULL, &event);
+    err = clblasSdot(N, bufDotP, 0, bufX, 0, incx, bufY, 0, incy, scratchBuff,
+         1, &queue, 0, NULL, &event);
+
     if (err != CL_SUCCESS) {
         status_code = gauss_CL_ERROR;
     } else {
@@ -130,8 +197,9 @@ gauss_Error gauss_clblas_sdot(
         /* Fetch results of calculations from GPU memory. */
         err = clEnqueueReadBuffer(queue, bufDotP, CL_TRUE, 0, sizeof(cl_float),
                                     &dotProduct, 0, NULL, NULL);
+        *out = dotProduct;
     }
-    *out = dotProduct;
+
     /* Release OpenCL events. */
     clReleaseEvent(event);
     /* Release OpenCL memory objects. */

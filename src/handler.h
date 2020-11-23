@@ -6,23 +6,6 @@
 
 #include "opencl.h"
 
-typedef enum gauss_MemKind {
-    gauss_RECCOMENDED = 0, /* let gauss reccomend the backend */
-    gauss_FLOAT = 1,
-    gauss_DOUBLE = 2,
-    gauss_CL_FLOAT = 3
-} gauss_MemKind;
-
-typedef struct gauss_Mem {
-    gauss_MemKind kind;
-    union {
-        void *vd;
-        double *dbl;
-        float *flt;
-        cl_mem cl_float;
-    } data;
-} gauss_Mem;
-
 extern double (*_gauss_cblas_ddot)(
     OPENBLAS_CONST blasint n,
     OPENBLAS_CONST double *x,
