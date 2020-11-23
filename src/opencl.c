@@ -60,50 +60,6 @@ gauss_Error gauss_init_opencl(void) {
     return gauss_OK;
 }
 
-/*
-static void print_arr_f32(float *arr, size_t size) {
-    size_t i = 0;
-    for (i = 0; i < size - 1; i++) {
-        printf("%f, ", arr[i]);
-    }
-    if (i > 0) {
-        printf("%f", arr[i]);
-    }
-    printf("\n");
-}
-*/
-
-void gauss_opencl_free(cl_mem ptr) {
-    clReleaseMemObject(ptr);
-}
-
-gauss_Error gauss_enqueue_gpu_memory(float *ptr, size_t nmemb) {
-    int err = gauss_OK;
-    cl_mem buf = clCreateBuffer(
-        ctx,
-        CL_MEM_READ_ONLY,
-        (nmemb * sizeof(cl_float)),
-        NULL,
-        &err
-    );
-    err = clEnqueueWriteBuffer(
-        queue,
-        buf,
-        CL_TRUE,
-        0,
-        (nmemb * sizeof(cl_float)),
-        ptr,
-        0,
-        NULL,
-        NULL
-    );
-    if (err) {
-        return gauss_CL_ERROR;
-    } else {
-        return gauss_OK;
-    }
-}
-
 gauss_Error gauss_clblas_sdot(
     const size_t N,
     gauss_Mem *X,
@@ -120,25 +76,6 @@ gauss_Error gauss_clblas_sdot(
 
     bufX = X->data.cl_float;
     bufY = Y->data.cl_float;
-
-
-/*
-    bufX = clCreateBuffer(
-        ctx,
-        CL_MEM_READ_ONLY,
-        (lenX*sizeof(cl_float)),
-        NULL,
-        &err
-    );
-
-    bufY = clCreateBuffer(
-        ctx,
-        CL_MEM_READ_ONLY,
-        (lenY*sizeof(cl_float)),
-        NULL,
-        &err
-    );
-*/
 
     /* Allocate 1 element space for dotProduct */
     bufDotP = clCreateBuffer(
@@ -157,32 +94,6 @@ gauss_Error gauss_clblas_sdot(
         NULL,
         &err
     );
-
-/*
-    err = clEnqueueWriteBuffer(
-        queue,
-        bufX,
-        CL_TRUE,
-        0,
-        (lenX*sizeof(cl_float)),
-        X,
-        0,
-        NULL,
-        NULL
-    );
-
-    err = clEnqueueWriteBuffer(
-        queue,
-        bufY,
-        CL_TRUE,
-        0,
-        (lenY*sizeof(cl_float)),
-        Y,
-        0,
-        NULL,
-        NULL
-    );
-*/
 
     /* Call clblas function. */
     err = clblasSdot(N, bufDotP, 0, bufX, 0, incx, bufY, 0, incy, scratchBuff,
