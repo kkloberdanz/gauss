@@ -203,8 +203,6 @@ gauss_Error gauss_clblas_sdot(
     /* Release OpenCL events. */
     clReleaseEvent(event);
     /* Release OpenCL memory objects. */
-    clReleaseMemObject(bufY);
-    clReleaseMemObject(bufX);
     clReleaseMemObject(bufDotP);
     clReleaseMemObject(scratchBuff);
     return status_code;

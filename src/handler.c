@@ -180,8 +180,6 @@ gauss_Mem *gauss_alloc(size_t nmemb, gauss_MemKind kind) {
             break;
 
         case gauss_CL_FLOAT: {
-            /* TODO:
-             * create function to allocate and enqueue an OpenCL buffer */
             fprintf(stderr, "allocating cl float\n");
             cl_context ctx = gauss_get_cl_ctx();
             cl_int err = 0;
