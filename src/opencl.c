@@ -66,9 +66,8 @@ gauss_Error gauss_clblas_sdot(
     const int incx,
     gauss_Mem *Y,
     const int incy,
-    float *out /* result from dot product */
+    gauss_Mem *out /* result from dot product */
 ) {
-    cl_float dotProduct; /* result from dot product */
     cl_int err;
     gauss_Error status_code = gauss_OK;
     cl_mem bufX, bufY, bufDotP, scratchBuff;
@@ -76,15 +75,6 @@ gauss_Error gauss_clblas_sdot(
 
     bufX = X->data.cl_float;
     bufY = Y->data.cl_float;
-
-    /* Allocate 1 element space for dotProduct */
-    bufDotP = clCreateBuffer(
-        ctx,
-        CL_MEM_WRITE_ONLY,
-        (sizeof(cl_float)),
-        NULL,
-        &err
-    );
 
     /* Allocate minimum of N elements */
     scratchBuff = clCreateBuffer(
@@ -101,19 +91,12 @@ gauss_Error gauss_clblas_sdot(
 
     if (err != CL_SUCCESS) {
         status_code = gauss_CL_ERROR;
-    } else {
-        /* Wait for calculations to be finished. */
-        err = clWaitForEvents(1, &event);
-        /* Fetch results of calculations from GPU memory. */
-        err = clEnqueueReadBuffer(queue, bufDotP, CL_TRUE, 0, sizeof(cl_float),
-                                    &dotProduct, 0, NULL, NULL);
-        *out = dotProduct;
     }
 
-    /* Release OpenCL events. */
-    clReleaseEvent(event);
+    out->data.cl_float = bufDotP;
+    out->event = event;
+
     /* Release OpenCL memory objects. */
-    clReleaseMemObject(bufDotP);
     clReleaseMemObject(scratchBuff);
     return status_code;
 }

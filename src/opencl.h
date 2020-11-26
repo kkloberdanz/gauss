@@ -18,7 +18,7 @@ gauss_Error gauss_clblas_sdot(
     const int incx,
     gauss_Mem *Y,
     const int incy,
-    float *out /* result from dot product */
+    gauss_Mem *out /* result from dot product */
 );
 
 #endif /* GAUSS_OPENCL_H */

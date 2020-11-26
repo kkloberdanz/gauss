@@ -50,7 +50,7 @@ gauss_Error gauss_vec_dot_cl_float(
 }
 */
 
-gauss_Error gauss_vec_dot(gauss_Mem *a, gauss_Mem *b, void *out) {
+gauss_Error gauss_vec_dot(gauss_Mem *out, gauss_Mem *a, gauss_Mem *b) {
     gauss_Error error = gauss_OK;
 
     if (a->kind != b->kind) {

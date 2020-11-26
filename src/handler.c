@@ -106,6 +106,10 @@ void gauss_init(void) {
     if (clblas_handle) {
         if (gauss_init_opencl() == gauss_OK) {
             has_clblas = true;
+            /* TODO: dlsym the necessary clBLAS functions
+             * That way one does not have to build gauss with clBLAS
+             */
+
         } else {
             dlclose(clblas_handle);
         }
@@ -156,15 +160,33 @@ gauss_Error gauss_set_buffer(gauss_Mem *dst, void *src) {
     return error;
 }
 
-gauss_Mem *gauss_alloc(size_t nmemb, gauss_MemKind kind) {
+gauss_MemKind gauss_determine_best_backend(void) {
+    if (has_clblas) {
+        return gauss_CL_FLOAT;
+    } else {
+        return gauss_DOUBLE;
+    }
+}
+
+/**
+ * Allocates a gauss memory object.
+ * if kind is -1, then gauss will decide what is the best backend to use
+ * at runtime
+ */
+gauss_Mem *gauss_alloc(size_t nmemb, int kind) {
     gauss_Mem *ptr = malloc(sizeof(gauss_Mem));
     if (!ptr) {
         goto fail;
     }
 
+    if (kind == -1) {
+        kind = gauss_determine_best_backend();
+    }
+
     ptr->kind = kind;
     ptr->data.vd = NULL;
     ptr->nmemb = nmemb;
+
     switch (kind) {
         case gauss_FLOAT:
             ptr->data.flt = gauss_simd_alloc(sizeof(float) * nmemb);
@@ -221,5 +243,67 @@ void gauss_free(gauss_Mem *ptr) {
         }
         ptr->data.vd = NULL;
         free(ptr);
+    }
+}
+
+/*
+ * Read a single value from gauss memory
+ */
+void gauss_read_value(gauss_Mem *obj, void *out) {
+    switch (obj->kind) {
+        case gauss_CL_FLOAT: {
+            cl_float dotProduct; /* result from dot product */
+            cl_int err;
+
+            /* Allocate 1 element space for dotProduct */
+            obj->data.cl_float = clCreateBuffer(
+                gauss_get_cl_ctx(),
+                CL_MEM_WRITE_ONLY,
+                (sizeof(cl_float)),
+                NULL,
+                &err
+            );
+
+
+            /* TODO: wait for cl events, enqueu read buffer, and set out
+             * to read buffer*/
+            *(float *)out = 42.0;
+            /* Wait for calculations to be finished. */
+            err = clWaitForEvents(1, &(obj->event));
+
+            /* Fetch results of calculations from GPU memory. */
+            err = clEnqueueReadBuffer(gauss_get_queue(), obj->data.cl_float,
+                    CL_TRUE, 0, sizeof(cl_float), &dotProduct, 0, NULL, NULL
+            );
+            *(float *)out = dotProduct;
+
+            /* Release OpenCL events. */
+            clReleaseEvent(obj->event);
+            break;
+        }
+
+        case gauss_FLOAT:
+            *(float *)out = *obj->data.flt;
+            break;
+
+        case gauss_DOUBLE:
+            *(double *)out = *obj->data.dbl;
+            break;
+    }
+}
+
+/*
+ * Read a buffer from gauss memory
+ */
+void *gauss_read_buffer(gauss_Mem *obj) {
+    switch (obj->kind) {
+        case gauss_CL_FLOAT:
+            /* TODO: wait for cl events, enqueue read buffer,
+             * and return read buffer*/
+            return NULL;
+
+        case gauss_FLOAT:
+        case gauss_DOUBLE:
+            return obj->data.vd;
     }
 }
