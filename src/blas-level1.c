@@ -267,7 +267,7 @@ gauss_Error gauss_vec_scale(
                 dst->data.flt,
                 a->data.flt,
                 size,
-                *(double *)scalar
+                *(float *)scalar
             );
             break;
 

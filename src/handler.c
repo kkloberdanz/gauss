@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <dlfcn.h>
 #include <string.h>
@@ -238,4 +239,16 @@ void gauss_free(gauss_Mem *ptr) {
         ptr->data.vd = NULL;
         free(ptr);
     }
+}
+
+const char *gauss_get_dtype(const gauss_Mem *obj) {
+    switch (obj->kind) {
+        case gauss_DOUBLE:
+            return "double";
+        case gauss_FLOAT:
+            return "float";
+        case gauss_CL_FLOAT:
+            return "cl_float";
+    }
+    return "invalid";
 }
