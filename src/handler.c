@@ -252,3 +252,21 @@ const char *gauss_get_dtype(const gauss_Mem *obj) {
     }
     return "invalid";
 }
+
+const char *gauss_error_to_string(const gauss_Error e) {
+    switch (e) {
+        case gauss_OK:
+            return "ok";
+        case gauss_MISMATCHED_TYPES:
+            return "mismatched types";
+        case gauss_MISMATCHED_DIMENSIONS:
+            return "mismatched dimensions";
+        case gauss_OUT_OF_MEMORY:
+            return "out of memory";
+        case gauss_GENERIC_ERROR:
+            return "generic error";
+        case gauss_CL_ERROR:
+            return "cl error";
+    }
+    return "invalid error code";
+}
