@@ -156,10 +156,22 @@ gauss_Error gauss_set_buffer(gauss_Mem *dst, void *src) {
     return error;
 }
 
-gauss_Mem *gauss_alloc(size_t nmemb, gauss_MemKind kind) {
+gauss_MemKind gauss_determine_best_backend(void) {
+    if (has_clblas) {
+        return gauss_CL_FLOAT;
+    } else {
+        return gauss_DOUBLE;
+    }
+}
+
+gauss_Mem *gauss_alloc(size_t nmemb, int kind) {
     gauss_Mem *ptr = malloc(sizeof(gauss_Mem));
     if (!ptr) {
         goto fail;
+    }
+
+    if (kind == -1) {
+        kind = gauss_determine_best_backend();
     }
 
     ptr->kind = kind;
@@ -190,6 +202,10 @@ gauss_Mem *gauss_alloc(size_t nmemb, gauss_MemKind kind) {
             ptr->data.cl_float = cl_buf;
             break;
         }
+
+        default:
+            fprintf(stderr, "invalid gauss type: %d\n", kind);
+            exit(EXIT_FAILURE);
     }
 
     if (!ptr->data.vd) {

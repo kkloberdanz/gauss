@@ -60,6 +60,15 @@ gauss_Error gauss_init_opencl(void) {
     return gauss_OK;
 }
 
+gauss_Error gauss_close_opencl() {
+    /* Finalize work with clblas. */
+    clblasTeardown();
+    /* Release OpenCL working objects. */
+    clReleaseCommandQueue(queue);
+    clReleaseContext(ctx);
+    return gauss_OK;
+}
+
 gauss_Error gauss_clblas_sdot(
     const size_t N,
     gauss_Mem *X,
@@ -112,17 +121,62 @@ gauss_Error gauss_clblas_sdot(
 
     /* Release OpenCL events. */
     clReleaseEvent(event);
+
     /* Release OpenCL memory objects. */
     clReleaseMemObject(bufDotP);
     clReleaseMemObject(scratchBuff);
     return status_code;
 }
 
-gauss_Error gauss_close_opencl() {
-    /* Finalize work with clblas. */
-    clblasTeardown();
-    /* Release OpenCL working objects. */
-    clReleaseCommandQueue(queue);
-    clReleaseContext(ctx);
-    return gauss_OK;
+gauss_Error gauss_clblas_snrm2(gauss_Mem *obj, float *out) {
+    gauss_Error status_code = gauss_OK;
+    cl_int err;
+    cl_mem bufNRM2;
+    cl_mem scratchBuff;
+    cl_event event = NULL;
+    cl_float NRM2;
+    const int inc = 1;
+    const size_t size = obj->nmemb;
+
+    fprintf(stderr, "size: %zu\n", obj->nmemb);
+    fprintf(stderr, "out: %f\n", *out);
+
+    /* Allocate 1 element space for NRM2 */
+    bufNRM2 = clCreateBuffer(ctx, CL_MEM_WRITE_ONLY,
+        (sizeof(cl_float)), NULL, &err
+    );
+
+    /* Allocate minimum of N elements */
+    scratchBuff = clCreateBuffer(ctx, CL_MEM_READ_WRITE,
+        (2*size*sizeof(cl_float)), NULL, &err
+    );
+
+    err = clEnqueueWriteBuffer(
+        queue, obj->data.cl_float, CL_TRUE, 0,
+        (size*sizeof(cl_float)), obj->data.cl_float,
+        0, NULL, NULL
+    );
+
+    /* Call clblas function. */
+    err = clblasSnrm2(size, bufNRM2, 0, obj->data.cl_float, 0, inc,
+        scratchBuff, 1, &queue, 0, NULL, &event
+    );
+    if (err != CL_SUCCESS) {
+        status_code = gauss_CL_ERROR;
+    } else {
+        /* Wait for calculations to be finished. */
+        err = clWaitForEvents(1, &event);
+        /* Fetch results of calculations from GPU memory. */
+        err = clEnqueueReadBuffer(queue, bufNRM2, CL_TRUE, 0, sizeof(cl_float),
+                                    &NRM2, 0, NULL, NULL);
+        *out = NRM2;
+    }
+    /* Release OpenCL events. */
+    clReleaseEvent(event);
+
+    /* Release OpenCL memory objects. */
+    clReleaseMemObject(bufNRM2);
+    clReleaseMemObject(scratchBuff);
+
+    return status_code;
 }

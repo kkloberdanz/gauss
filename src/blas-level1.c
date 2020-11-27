@@ -152,6 +152,29 @@ float gauss_vec_l2norm_f32(float *a, size_t size) {
     return norm;
 }
 
+gauss_Error gauss_vec_l2norm(gauss_Mem *a, void *out) {
+    gauss_Error error = gauss_OK;
+    switch (a->kind) {
+        case gauss_FLOAT:
+            *(float *)out = gauss_vec_l2norm_f32(a->data.flt, a->nmemb);
+            break;
+
+        case gauss_DOUBLE:
+            *(double *)out = gauss_vec_l2norm_f64(a->data.dbl, a->nmemb);
+            break;
+
+        case gauss_CL_FLOAT: {
+            float cl_out = 0.0;
+            error = gauss_clblas_snrm2(a, &cl_out);
+            if (!error) {
+                *(float *)out = cl_out;
+            }
+            break;
+        }
+    }
+    return error;
+}
+
 double gauss_vec_l1norm_f64(double *a, size_t size) {
     size_t i;
     double acc = 0.0;

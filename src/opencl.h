@@ -21,4 +21,6 @@ gauss_Error gauss_clblas_sdot(
     float *out /* result from dot product */
 );
 
+gauss_Error gauss_clblas_snrm2(gauss_Mem *obj, float *out);
+
 #endif /* GAUSS_OPENCL_H */
