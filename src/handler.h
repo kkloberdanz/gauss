@@ -6,7 +6,11 @@
 
 #include "opencl.h"
 
-typedef int64_t blasint;
+#if __LP64__ /* check if target is 64 or 32 bit */
+    typedef int64_t blasint;
+#else
+    typedef int32_t blasint;
+#endif
 
 extern double (*_gauss_cblas_ddot)(
     const blasint n,

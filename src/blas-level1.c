@@ -34,22 +34,6 @@ void gauss_vec_scale_f32(float *dst, float *a, size_t size, float scalar) {
     }
 }
 
-/*
-gauss_Error gauss_vec_dot_cl_float(
-    float *a, float *b, size_t size, float *out
-) {
-    gauss_Error status_code = gauss_clblas_sdot(
-        size,
-        a,
-        1,
-        b,
-        1,
-        out
-    );
-    return status_code;
-}
-*/
-
 gauss_Error gauss_vec_dot(gauss_Mem *a, gauss_Mem *b, void *out) {
     gauss_Error error = gauss_OK;
 
@@ -63,11 +47,19 @@ gauss_Error gauss_vec_dot(gauss_Mem *a, gauss_Mem *b, void *out) {
 
     switch (a->kind) {
         case gauss_FLOAT:
-            *(float *)out = gauss_vec_dot_f32(a->data.flt, b->data.flt, a->nmemb);
+            *(float *)out = gauss_vec_dot_f32(
+                a->data.flt,
+                b->data.flt,
+                a->nmemb
+            );
             break;
 
         case gauss_DOUBLE:
-            *(double *)out = gauss_vec_dot_f64(a->data.dbl, b->data.dbl, a->nmemb);
+            *(double *)out = gauss_vec_dot_f64(
+                a->data.dbl,
+                b->data.dbl,
+                a->nmemb
+            );
             break;
 
         case gauss_CL_FLOAT: {
@@ -85,6 +77,52 @@ gauss_Error gauss_vec_dot(gauss_Mem *a, gauss_Mem *b, void *out) {
             }
             break;
         }
+    }
+
+    return error;
+}
+
+double gauss_vec_sum_f64(double *a, size_t size) {
+    size_t i;
+    double acc = 0.0;
+
+    for (i = 0; i < size; i++) {
+        acc += a[i];
+    }
+    return acc;
+}
+
+float gauss_vec_sum_f32(float *a, size_t size) {
+    size_t i;
+    float acc = 0.0;
+
+    for (i = 0; i < size; i++) {
+        acc += a[i];
+    }
+    return acc;
+}
+
+gauss_Error gauss_vec_sum(gauss_Mem *a, void *out) {
+    gauss_Error error = gauss_OK;
+
+    switch (a->kind) {
+        case gauss_FLOAT:
+            *(float *)out = gauss_vec_sum_f32(
+                a->data.flt,
+                a->nmemb
+            );
+            break;
+
+        case gauss_DOUBLE:
+            *(double *)out = gauss_vec_sum_f64(
+                a->data.dbl,
+                a->nmemb
+            );
+            break;
+
+        case gauss_CL_FLOAT:
+            /* TODO: implement opencl sum */
+            break;
     }
 
     return error;

@@ -158,11 +158,14 @@ gauss_Error gauss_set_buffer(gauss_Mem *dst, void *src) {
 }
 
 gauss_MemKind gauss_determine_best_backend(void) {
+    /* TODO: once everything is implemented in OpenCL, enable this
     if (has_clblas) {
         return gauss_CL_FLOAT;
     } else {
         return gauss_DOUBLE;
     }
+    */
+    return gauss_DOUBLE;
 }
 
 gauss_Mem *gauss_alloc(size_t nmemb, int kind) {

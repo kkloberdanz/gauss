@@ -417,16 +417,6 @@ void gauss_vec_mul_f64(double *dst, double *a, double *b, size_t size) {
     }
 }
 
-double gauss_vec_sum_f64(double *a, size_t size) {
-    size_t i;
-    double acc = 0.0;
-
-    for (i = 0; i < size; i++) {
-        acc += a[i];
-    }
-    return acc;
-}
-
 double gauss_variance_f64(double *a, size_t size) {
     double acc = 0.0;
     size_t i;
