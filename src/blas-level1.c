@@ -128,6 +128,62 @@ gauss_Error gauss_vec_sum(gauss_Mem *a, void *out) {
     return error;
 }
 
+double gauss_vec_l1norm_f64(double *a, size_t size) {
+    size_t i;
+    double acc = 0.0;
+
+    if (has_openblas) {
+        acc = _gauss_cblas_dasum(size, a, 1);
+    } else {
+        /* if nothing better exists, brute force it */
+        for (i = 0; i < size; i++) {
+            acc += fabs(a[i]);
+        }
+    }
+    return acc;
+}
+
+float gauss_vec_l1norm_f32(float *a, size_t size) {
+    size_t i;
+    float acc = 0.0;
+
+    if (has_openblas) {
+        acc = _gauss_cblas_sasum(size, a, 1);
+    } else {
+        /* if nothing better exists, brute force it */
+        for (i = 0; i < size; i++) {
+            acc += fabs(a[i]);
+        }
+    }
+    return acc;
+}
+
+gauss_Error gauss_vec_l1norm(gauss_Mem *a, void *out) {
+    gauss_Error error = gauss_OK;
+
+    switch (a->kind) {
+        case gauss_FLOAT:
+            *(float *)out = gauss_vec_l1norm_f32(
+                a->data.flt,
+                a->nmemb
+            );
+            break;
+
+        case gauss_DOUBLE:
+            *(double *)out = gauss_vec_l1norm_f64(
+                a->data.dbl,
+                a->nmemb
+            );
+            break;
+
+        case gauss_CL_FLOAT:
+            /* TODO: implement opencl l1norm */
+            break;
+    }
+
+    return error;
+}
+
 float gauss_vec_dot_f32(float *a, float *b, size_t size) {
     float acc = 0.0;
     size_t i;
@@ -211,36 +267,6 @@ gauss_Error gauss_vec_l2norm(gauss_Mem *a, void *out) {
         }
     }
     return error;
-}
-
-double gauss_vec_l1norm_f64(double *a, size_t size) {
-    size_t i;
-    double acc = 0.0;
-
-    if (has_openblas) {
-        acc = _gauss_cblas_dasum(size, a, 1);
-    } else {
-        /* if nothing better exists, brute force it */
-        for (i = 0; i < size; i++) {
-            acc += fabs(a[i]);
-        }
-    }
-    return acc;
-}
-
-float gauss_vec_l1norm_f32(float *a, size_t size) {
-    size_t i;
-    float acc = 0.0;
-
-    if (has_openblas) {
-        acc = _gauss_cblas_sasum(size, a, 1);
-    } else {
-        /* if nothing better exists, brute force it */
-        for (i = 0; i < size; i++) {
-            acc += fabs(a[i]);
-        }
-    }
-    return acc;
 }
 
 size_t gauss_vec_index_max_f64(double *a, size_t size) {
