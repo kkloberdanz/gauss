@@ -359,18 +359,6 @@ void gauss_div_double_scalar(
     }
 }
 
-double gauss_mean_double_array(
-    const double *a,
-    const size_t size
-) {
-    size_t i = 0;
-    double acc = 0.0;
-    for (; i < size; i++) {
-        acc += a[i];
-    }
-    return acc / size;
-}
-
 static int compare_double(const void *a, const void *b) {
     if (*(double *)a < *(double *)b) {
         return -1;
@@ -416,29 +404,8 @@ void gauss_vec_mul_f64(double *dst, double *a, double *b, size_t size) {
         dst[i] = a[i] * b[i];
     }
 }
-
-double gauss_variance_f64(double *a, size_t size) {
-    double acc = 0.0;
-    size_t i;
-    double mean = gauss_mean_double_array(a, size);
-
-    for (i = 0; i < size; i++) {
-        acc += (a[i] - mean) * (a[i] - mean);
-    }
-    return acc / size;
-}
-
+/*
 double gauss_standard_deviation_f64(double *a, size_t size) {
     return sqrt(gauss_variance_f64(a, size));
 }
-
-double gauss_min_vec_f64(const double *a, size_t size) {
-    size_t i;
-    double min_element = a[0];
-    for (i = 0; i < size; i++) {
-        if (a[i] < min_element) {
-            min_element = a[i];
-        }
-    }
-    return min_element;
-}
+*/

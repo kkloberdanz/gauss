@@ -3,6 +3,8 @@
 #include "vec-math.h"
 #include "util.h"
 
+#if 0
+
 /*
 def ordinary_least_squares(x, y):
     mean_x = x.mean()
@@ -99,3 +101,4 @@ free_x_diff:
 exit_oom:
     return gauss_OUT_OF_MEMORY;
 }
+#endif

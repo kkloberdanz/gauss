@@ -4,6 +4,7 @@
 #include "util.h"
 #include "blas-level1.h"
 
+#if 0
 gauss_Error guass_mean_squared_error(
     double *y_true,
     double *y_predicted,
@@ -32,3 +33,4 @@ gauss_Error guass_mean_squared_error(
 
     return gauss_OK;
 }
+#endif

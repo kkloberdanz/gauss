@@ -72,8 +72,6 @@ double gauss_double_array_at(const double *arr, size_t i);
 
 void gauss_set_double_array_at(double *arr, size_t i, double value);
 
-double gauss_mean_double_array(const double *a, const size_t size);
-
 double gauss_vec_sum_f64(double *a, size_t size);
 
 void gauss_vec_add_f64(double *dst, double *a, double *b, size_t size);

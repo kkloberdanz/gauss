@@ -319,6 +319,45 @@ size_t gauss_vec_argmax(gauss_Mem *a, void *out) {
     return error;
 }
 
+gauss_Error gauss_vec_argmin(const gauss_Mem *a, size_t *out) {
+    size_t i;
+    gauss_Error error = gauss_OK;
+    size_t min_i = 0;
+
+    switch (a->kind) {
+        case gauss_FLOAT: {
+            float *arr = a->data.flt;
+            float min_element = arr[0];
+            for (i = 0; i < a->nmemb; i++) {
+                if (arr[i] < min_element) {
+                    min_element = arr[i];
+                    min_i = i;
+                }
+            }
+            *out = min_i;
+            break;
+        }
+
+        case gauss_DOUBLE: {
+            double *arr = a->data.dbl;
+            double min_element = arr[0];
+            for (i = 0; i < a->nmemb; i++) {
+                if (arr[i] < min_element) {
+                    min_element = arr[i];
+                    min_i = i;
+                }
+            }
+            *out = min_i;
+            break;
+        }
+
+        case gauss_CL_FLOAT:
+            /* TODO */
+            break;
+    }
+    return error;
+}
+
 gauss_Error gauss_vec_scale(
     gauss_Mem *dst,
     gauss_Mem *a,
@@ -358,4 +397,80 @@ gauss_Error gauss_vec_scale(
     }
 
     return gauss_OK;
+}
+
+gauss_Error gauss_vec_mean(const gauss_Mem *a, void *out) {
+    gauss_Error error = gauss_OK;
+    size_t i = 0;
+
+    switch (a->kind) {
+        case gauss_FLOAT: {
+            float acc = 0.0;
+            float *arr = a->data.flt;
+            for (i = 0; i < a->nmemb; i++) {
+                acc += arr[i];
+            }
+            *(float *)out = acc / a->nmemb;
+            break;
+        }
+
+        case gauss_DOUBLE: {
+            double acc = 0.0;
+            double *arr = a->data.dbl;
+            for (i = 0; i < a->nmemb; i++) {
+                acc += arr[i];
+            }
+            *(double *)out = acc / a->nmemb;
+            break;
+        }
+
+        case gauss_CL_FLOAT:
+            break;
+    }
+    return error;
+}
+
+gauss_Error gauss_vec_variance(gauss_Mem *a, void *out) {
+    gauss_Error error = gauss_OK;
+
+    switch (a->kind) {
+        case gauss_DOUBLE: {
+            double acc = 0.0;
+            size_t i;
+            double mean;
+            double *arr = a->data.dbl;
+            error = gauss_vec_mean(a, &mean);
+            if (error) {
+                return error;
+            }
+
+            for (i = 0; i < a->nmemb; i++) {
+                acc += (arr[i] - mean) * (arr[i] - mean);
+            }
+            *(double *)out = acc / a->nmemb;
+            break;
+        }
+
+        case gauss_FLOAT: {
+            float acc = 0.0;
+            size_t i;
+            float mean;
+            float *arr = a->data.flt;
+            error = gauss_vec_mean(a, &mean);
+            if (error) {
+                return error;
+            }
+
+            for (i = 0; i < a->nmemb; i++) {
+                acc += (arr[i] - mean) * (arr[i] - mean);
+            }
+            *(float *)out = acc / a->nmemb;
+            break;
+        }
+
+        case gauss_CL_FLOAT:
+            /* TODO */
+            break;
+    }
+    return error;
 }
