@@ -301,6 +301,24 @@ size_t gauss_vec_index_max_f32(float *a, size_t size) {
     return idx;
 }
 
+size_t gauss_vec_argmax(gauss_Mem *a, void *out) {
+    gauss_Error error = gauss_OK;
+    switch (a->kind) {
+        case gauss_FLOAT:
+            *(size_t *)out = gauss_vec_index_max_f32(a->data.flt, a->nmemb);
+            break;
+
+        case gauss_DOUBLE:
+            *(size_t *)out = gauss_vec_index_max_f64(a->data.dbl, a->nmemb);
+            break;
+
+        case gauss_CL_FLOAT:
+            /* TODO: implement for OpenCL */
+            break;
+    }
+    return error;
+}
+
 gauss_Error gauss_vec_scale(
     gauss_Mem *dst,
     gauss_Mem *a,
