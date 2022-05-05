@@ -12,6 +12,14 @@
     typedef int32_t blasint;
 #endif
 
+#define TRY(expr)                                                             \
+    do {                                                                      \
+        int _gauss_error;                                                     \
+        if ((_gauss_error = (expr))) {                                        \
+            return _gauss_error;                                              \
+        }                                                                     \
+    } while (0)
+
 extern double (*_gauss_cblas_ddot)(
     const blasint n,
     const double *x,

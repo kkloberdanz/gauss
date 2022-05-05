@@ -439,10 +439,8 @@ gauss_Error gauss_vec_variance(gauss_Mem *a, void *out) {
             size_t i;
             double mean;
             double *arr = a->data.dbl;
-            error = gauss_vec_mean(a, &mean);
-            if (error) {
-                return error;
-            }
+
+            TRY(gauss_vec_mean(a, &mean));
 
             for (i = 0; i < a->nmemb; i++) {
                 acc += (arr[i] - mean) * (arr[i] - mean);
@@ -456,10 +454,8 @@ gauss_Error gauss_vec_variance(gauss_Mem *a, void *out) {
             size_t i;
             float mean;
             float *arr = a->data.flt;
-            error = gauss_vec_mean(a, &mean);
-            if (error) {
-                return error;
-            }
+
+            TRY(gauss_vec_mean(a, &mean));
 
             for (i = 0; i < a->nmemb; i++) {
                 acc += (arr[i] - mean) * (arr[i] - mean);
